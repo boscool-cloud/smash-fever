@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Smash Fever — U宝 Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+SC:wght@500;700;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --green:#4CAF50;--green2:#66BB6A;--green-dark:#2E7D32;
+  --yellow:#FFD600;--orange:#FF6D00;--red:#F44336;
+  --gold:#FFB300;--purple:#7B1FA2;--teal:#00897B;
+  --bg:#0a1628;--card:#111f38;--card2:#162440;
+  --text:#fff;--muted:#8fa8c8;
+}
+html,body{height:100%;overflow:hidden;touch-action:manipulation}
+body{font-family:'Nunito','Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100dvh}
+body.lang-zh{font-family:'Noto Sans SC','Nunito',sans-serif}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .35s,transform .35s;overflow-y:auto;padding:20px 16px}
+.screen.hidden{opacity:0;pointer-events:none;transform:scale(.96)}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle 3s infinite alternate}
+@keyframes twinkle{0%{opacity:.05}100%{opacity:.6}}
+
+/* LANG TOGGLE */
+.lang-toggle{position:fixed;top:14px;right:14px;background:rgba(20,35,60,.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:30px;padding:5px;display:flex;gap:2px;z-index:100;font-size:13px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.lang-toggle button{background:transparent;border:none;color:var(--muted);padding:6px 13px;border-radius:24px;cursor:pointer;font-family:inherit;font-weight:800;font-size:12px;transition:all .2s;letter-spacing:.5px}
+.lang-toggle button.on{background:linear-gradient(135deg,#43A047,#00897B);color:#fff;box-shadow:0 2px 6px rgba(76,175,80,.4)}
+.lang-toggle.in-game{display:none}
+
+/* LOGIN */
+#loginScreen{background:radial-gradient(ellipse at 30% 20%,#0d2a40 0%,#0a1628 60%)}
+.login-box{background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:30px 26px;width:100%;max-width:400px;position:relative;z-index:1;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.mascot-hero{text-align:center;margin-bottom:18px}
+.ubao-svg{width:100px;height:100px;display:block;margin:0 auto 10px;animation:bounce-in .7s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes bounce-in{0%{transform:scale(0) rotate(-20deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+.logo-title{font-family:'Fredoka One',cursive;font-size:38px;background:linear-gradient(135deg,#66BB6A,#26C6DA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.logo-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:800;color:var(--muted);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.7px}
+.form-input{width:100%;padding:14px 16px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:12px;color:#fff;font-size:16px;font-family:inherit;outline:none;transition:border-color .2s,background .2s}
+.form-input:focus{border-color:var(--green2);background:rgba(102,187,106,.08)}
+.form-input::placeholder{color:rgba(255,255,255,.25)}
+.btn-play{width:100%;padding:16px;background:linear-gradient(135deg,#43A047,#00897B);border:none;border-radius:12px;color:#fff;font-size:18px;font-weight:900;font-family:inherit;cursor:pointer;transition:transform .15s;letter-spacing:.3px}
+.btn-play:active{transform:scale(.97)}
+.switch-link{text-align:center;margin-top:12px;font-size:14px;color:var(--muted)}
+.switch-link span{color:var(--green2);cursor:pointer;font-weight:800}
+.ref-box{background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.2);border-radius:12px;padding:14px;margin-bottom:14px;display:none}
+
+/* MENU */
+#menuScreen{background:radial-gradient(ellipse at 50% 0%,#0d2a1a 0%,#0a1628 70%);padding-bottom:80px}
+.menu-mascot-wrap{position:relative;z-index:1;text-align:center;margin-bottom:6px;cursor:pointer}
+.menu-ubao{width:110px;height:110px;display:block;margin:0 auto;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 12px 24px rgba(76,175,80,.4))}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.menu-title{font-family:'Fredoka One',cursive;font-size:38px;background:linear-gradient(135deg,#66BB6A,#26C6DA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;position:relative;z-index:1}
+.menu-sub{font-size:13px;color:var(--muted);position:relative;z-index:1;margin-bottom:14px}
+.player-card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;max-width:380px;width:100%;position:relative;z-index:1}
+.progress-card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 16px;margin-bottom:10px;max-width:380px;width:100%;position:relative;z-index:1;transition:all .3s}
+.progress-card.unlocked{background:linear-gradient(135deg,rgba(255,183,0,.15),rgba(255,109,0,.08));border-color:var(--gold)}
+.progress-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px}
+.progress-label{color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-size:11px;font-weight:800}
+.progress-val{color:var(--gold);font-family:'Fredoka One',cursive;font-size:15px;letter-spacing:.5px}
+.progress-bar{height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;position:relative}
+.progress-fill{height:100%;background:linear-gradient(90deg,#43A047,#FFB300,#FF6D00);border-radius:4px;transition:width .8s cubic-bezier(.175,.885,.32,1.275);box-shadow:0 0 10px rgba(255,183,0,.5)}
+.progress-fill.full{background:linear-gradient(90deg,#FFB300,#FF6D00);animation:pulse-glow 1.5s infinite alternate}
+@keyframes pulse-glow{0%{box-shadow:0 0 10px rgba(255,183,0,.5)}100%{box-shadow:0 0 20px rgba(255,183,0,.9)}}
+.progress-sub{font-size:11px;color:var(--muted);margin-top:6px;text-align:center;font-weight:600}
+.progress-sub.done{color:var(--gold);font-weight:800}
+.p-avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--teal));display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.p-name{font-weight:800;font-size:17px}
+.p-stats{font-size:12px;color:var(--muted);margin-top:2px}
+.rm-badge{background:linear-gradient(135deg,#FFB300,#FF6D00);border-radius:20px;padding:5px 14px;font-size:14px;font-weight:900;color:#fff;box-shadow:0 3px 10px rgba(255,109,0,.4)}
+.daily-row{background:linear-gradient(135deg,rgba(255,183,0,.12),rgba(255,109,0,.08));border:1px solid rgba(255,183,0,.25);border-radius:14px;padding:11px 16px;max-width:380px;width:100%;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;position:relative;z-index:1;transition:transform .15s}
+.daily-row:active{transform:scale(.97)}
+.ref-row-btn{background:var(--card2);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:12px 16px;max-width:380px;width:100%;display:flex;align-items:center;gap:12px;cursor:pointer;position:relative;z-index:1;margin-bottom:12px;transition:transform .15s}
+.ref-row-btn:active{transform:scale(.97)}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:380px;width:100%;position:relative;z-index:1}
+.m-btn{background:var(--card);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.m-btn:active{transform:scale(.94)}
+.m-btn:hover{box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.m-btn .mi{font-size:32px}
+.m-btn .ml{font-size:14px;font-weight:800}
+.m-btn .md{font-size:11px;color:var(--muted);text-align:center}
+.m-btn.big{background:linear-gradient(135deg,#2E7D32,#00695C);border-color:var(--green);grid-column:span 2;flex-direction:row;justify-content:center;gap:12px;padding:18px 12px}
+.m-btn.big .ml{font-size:22px}
+
+/* WEAPON */
+#weaponScreen{background:var(--bg);padding-bottom:30px}
+.stitle{font-family:'Fredoka One',cursive;font-size:28px;color:var(--green2);margin-bottom:4px;text-align:center;position:relative;z-index:1}
+.ssub{font-size:13px;color:var(--muted);margin-bottom:20px;text-align:center;position:relative;z-index:1}
+.wgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:400px;width:100%;margin-bottom:16px}
+.wcard{background:var(--card);border:2px solid transparent;border-radius:16px;padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .2s}
+.wcard:active{transform:scale(.95)}
+.wcard.on{border-color:var(--green2);background:rgba(76,175,80,.1)}
+.wcard .wi{font-size:42px;transition:transform .2s}
+.wcard:hover .wi{transform:scale(1.1) rotate(-8deg)}
+.wcard .wn{font-weight:800;font-size:14px}
+.wcard .wd{font-size:11px;color:var(--muted);text-align:center}
+.upload-wrap{max-width:400px;width:100%;margin-bottom:16px}
+.upload-box{background:var(--card);border:2px dashed rgba(255,255,255,.18);border-radius:16px;padding:18px;text-align:center;cursor:pointer;transition:border-color .2s}
+.upload-box:hover{border-color:var(--green2)}
+.custom-thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;justify-content:center}
+.cthumb{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.2);cursor:pointer;transition:border-color .2s,transform .2s}
+.cthumb.on{border-color:var(--yellow);transform:scale(1.1)}
+.btn-row{display:flex;max-width:400px;width:100%;gap:10px}
+.btn-back{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 22px;color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s}
+.btn-back:active{background:rgba(255,255,255,.12)}
+.btn-go{flex:1;padding:14px;background:linear-gradient(135deg,#43A047,#00897B);border:none;border-radius:10px;color:#fff;font-size:17px;font-weight:900;font-family:inherit;cursor:pointer;transition:transform .15s}
+.btn-go:active{transform:scale(.97)}
+
+/* COUNTDOWN */
+#cdOverlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:200;flex-direction:column;gap:8px}
+.cd-num{font-family:'Fredoka One',cursive;font-size:140px;color:var(--green2);line-height:1;text-shadow:0 0 40px rgba(76,175,80,.6)}
+.cd-go{font-family:'Fredoka One',cursive;font-size:70px;color:var(--yellow);text-shadow:0 0 30px rgba(255,214,0,.6)}
+.cd-label{font-size:18px;color:var(--muted)}
+.cd-anim{animation:cd-pop .5s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes cd-pop{0%{transform:scale(2.5);opacity:0}100%{transform:scale(1);opacity:1}}
+
+/* GAME */
+#gameScreen{background:radial-gradient(ellipse at 50% 0%,#0d2a1a 0%,#0a1628 80%);padding:0;justify-content:flex-start;overflow:hidden}
+.hud{background:rgba(0,0,0,.45);backdrop-filter:blur(12px);width:100%;padding:10px 20px 8px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative;z-index:10;border-bottom:1px solid rgba(255,255,255,.06)}
+.hud-block{text-align:center}
+.hud-lbl{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.6px}
+.hud-val{font-family:'Fredoka One',cursive;font-size:30px;color:var(--yellow);line-height:1.1}
+.hud-val.lg{font-size:38px}
+.hud-val.urgent{color:var(--red)!important;animation:hpulse .4s infinite alternate}
+@keyframes hpulse{0%{transform:scale(1)}100%{transform:scale(1.15)}}
+.hud-val.sm{font-size:20px;color:#fff}
+.combo-hud{position:absolute;top:58px;left:50%;transform:translateX(-50%);font-family:'Fredoka One',cursive;font-size:26px;color:var(--orange);text-shadow:0 0 16px rgba(255,109,0,.7);z-index:15;pointer-events:none;white-space:nowrap;transition:opacity .3s}
+.field{flex:1;position:relative;width:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:8px 0}
+.grass{position:absolute;bottom:0;left:0;right:0;height:28%;background:linear-gradient(180deg,transparent,rgba(46,125,50,.25) 50%,rgba(27,94,32,.5) 100%);pointer-events:none}
+.holes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:450px;padding:0 14px;position:relative;z-index:4}
+.hole{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;cursor:pointer;touch-action:manipulation;user-select:none}
+.hole-pit{width:82%;padding-bottom:30%;background:radial-gradient(ellipse,#180c03 0%,#0a0501 100%);border-radius:50%;box-shadow:0 6px 18px rgba(0,0,0,.9),inset 0 4px 10px rgba(0,0,0,.95);position:relative;z-index:2}
+.hole-rim{position:absolute;bottom:calc(30% - 4px);left:9%;width:82%;height:8px;background:linear-gradient(180deg,#3d2a1a,#2a1a0a);border-radius:50%;z-index:3}
+.mc{position:absolute;bottom:20%;left:50%;transform:translateX(-50%);z-index:5;width:76px;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+.mole{width:76px;height:76px;position:relative;transform-origin:bottom center;pointer-events:auto;cursor:pointer;touch-action:manipulation}
+.mole.popping{animation:pop-up .18s cubic-bezier(.175,.885,.32,1.275) forwards}
+.mole.hiding{animation:pop-down .2s ease-in forwards}
+.mole.smashed{animation:smash-anim .35s forwards!important}
+@keyframes pop-up{0%{transform:scaleY(.05) translateY(80%);opacity:0}100%{transform:scaleY(1) translateY(0);opacity:1}}
+@keyframes pop-down{0%{transform:scaleY(1) translateY(0)}100%{transform:scaleY(.05) translateY(80%);opacity:0}}
+@keyframes smash-anim{0%{transform:scale(1.3) rotate(-5deg)}25%{transform:scale(.3) rotate(25deg)}60%{transform:scale(1.5) rotate(-10deg) translateY(-10px)}100%{transform:scale(0) rotate(40deg);opacity:0}}
+.fpts{position:fixed;font-family:'Fredoka One',cursive;font-size:26px;pointer-events:none;z-index:999;animation:fly-up .9s forwards}
+@keyframes fly-up{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-90px) scale(1.5)}}
+.guide{position:absolute;bottom:8px;left:8px;display:flex;align-items:flex-end;gap:6px;z-index:8}
+.guide-bubble{background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.15);border-radius:12px 12px 12px 0;padding:7px 11px;font-size:12px;color:#fff;max-width:160px}
+.hmr{position:fixed;pointer-events:none;z-index:9999;font-size:50px;transform:translate(-50%,-80%) rotate(-40deg);transition:left .03s,top .03s;display:none}
+.hmr.swing{animation:hammer-sw .18s forwards}
+@keyframes hammer-sw{0%{transform:translate(-50%,-80%) rotate(-40deg)}50%{transform:translate(-50%,-80%) rotate(-100deg) scale(1.4)}100%{transform:translate(-50%,-80%) rotate(-40deg)}}
+.hit-flash{position:fixed;inset:0;pointer-events:none;z-index:500;opacity:0;transition:opacity .1s}
+.hit-flash.go{opacity:1}
+
+/* RESULTS */
+#resultsScreen{background:var(--bg)}
+.res-card{background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:24px 22px;max-width:400px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.res-mascot{display:block;margin:0 auto 8px}
+.res-title{font-family:'Fredoka One',cursive;font-size:32px;line-height:1;margin-bottom:2px}
+.res-score{font-family:'Fredoka One',cursive;font-size:60px;background:linear-gradient(135deg,#FFD600,#FF6D00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin:8px 0}
+.res-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.rs-box{background:rgba(255,255,255,.05);border-radius:10px;padding:10px 6px}
+.rs-v{font-family:'Fredoka One',cursive;font-size:22px;color:var(--green2)}
+.rs-l{font-size:11px;color:var(--muted);margin-top:2px}
+.reward-box{border-radius:14px;padding:12px;margin:12px 0;display:flex;align-items:center;gap:12px;text-align:left}
+.reward-box.rm88{background:linear-gradient(135deg,rgba(255,183,0,.2),rgba(255,109,0,.12));border:1px solid var(--gold)}
+.reward-box.keep{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.reward-icon{font-size:32px}
+.reward-title{font-weight:800;font-size:14px}
+.reward-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.share-box{background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.2);border-radius:12px;padding:11px;cursor:pointer;transition:background .2s;margin:10px 0}
+.share-box:active{background:rgba(76,175,80,.15)}
+.share-title{font-weight:800;font-size:13px;color:var(--green2);margin-bottom:4px}
+.share-text{font-size:12px;color:var(--muted)}
+
+/* LB */
+#lbScreen{background:var(--bg);padding-bottom:30px}
+.lb-row{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;max-width:420px;width:100%}
+.lb-rank{font-family:'Fredoka One',cursive;font-size:20px;min-width:30px;text-align:center}
+.lb-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--teal));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.lb-nm{font-weight:800;font-size:15px}
+.lb-ph{font-size:11px;color:var(--muted)}
+.lb-sc{font-family:'Fredoka One',cursive;font-size:22px;color:var(--gold)}
+.hdr-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;max-width:420px;width:100%;align-self:flex-start}
+
+/* ADMIN */
+#adminScreen{background:var(--bg);justify-content:flex-start;align-items:stretch;padding:0}
+.admin-hdr{background:var(--card);width:100%;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06)}
+.admin-t{font-family:'Fredoka One',cursive;font-size:22px;color:var(--green2)}
+.admin-body{flex:1;overflow-y:auto;padding:16px;max-width:760px;width:100%;margin:0 auto}
+.tabs{display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:2px}
+.tab{padding:7px 18px;border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;border:1px solid rgba(255,255,255,.1);color:var(--muted);background:var(--card);transition:all .2s}
+.tab.on{background:var(--green);border-color:var(--green);color:#fff}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}
+.sc{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px}
+.sc-v{font-family:'Fredoka One',cursive;font-size:28px;color:var(--yellow)}
+.sc-l{font-size:12px;color:var(--muted);margin-top:2px}
+.srch{width:100%;padding:10px 14px;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:14px;font-family:inherit;outline:none;margin-bottom:14px}
+.srch:focus{border-color:var(--green2)}
+.tw{overflow-x:auto;border-radius:12px;border:1px solid rgba(255,255,255,.07)}
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt th{background:rgba(255,255,255,.04);padding:9px 12px;text-align:left;font-weight:700;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.dt td{padding:10px 12px;border-top:1px solid rgba(255,255,255,.04);white-space:nowrap}
+.dt tr:hover td{background:rgba(255,255,255,.025)}
+.bk{background:rgba(255,255,255,.07);border:none;border-radius:10px;padding:8px 14px;color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}
+.bk:active{background:rgba(255,255,255,.12)}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.bg-{background:rgba(76,175,80,.18);color:#81C784}
+.by{background:rgba(255,183,0,.18);color:#FFD54F}
+.bb{background:rgba(255,255,255,.08);color:var(--muted)}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-ov.hidden{display:none!important}
+.modal-box{background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:24px 22px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.modal-t{font-family:'Fredoka One',cursive;font-size:24px;color:var(--green2);margin-bottom:6px}
+.modal-s{font-size:13px;color:var(--muted);margin-bottom:16px}
+.code-box{background:rgba(255,255,255,.05);border:1.5px dashed rgba(76,175,80,.4);border-radius:14px;padding:14px;text-align:center;margin-bottom:14px}
+.code-val{font-family:'Fredoka One',cursive;font-size:28px;color:var(--green2);letter-spacing:3px}
+.code-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.tier-list{margin-bottom:16px}
+.tier{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.tier:last-child{border:none}
+.tier-l{font-size:13px;font-weight:600}
+.tier-r{font-size:14px;font-weight:900;color:var(--gold)}
+.btn-copy{width:100%;padding:13px;background:linear-gradient(135deg,#43A047,#00897B);border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:transform .15s}
+.btn-copy:active{transform:scale(.97)}
+.btn-close{width:100%;margin-top:10px;padding:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--muted);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer}
+
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(15,30,55,.95);border:1px solid rgba(76,175,80,.35);border-radius:14px;padding:11px 20px;font-size:15px;font-weight:700;color:#fff;z-index:1000;opacity:0;transition:all .28s;pointer-events:none;max-width:92vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:380px){
+  .holes{gap:10px;padding:0 10px}
+  .mc,.mole{width:70px;height:70px}
+  .hud-val{font-size:26px}
+  .hud-val.lg{font-size:32px}
+  .login-box{padding:24px 20px}
+  .logo-title{font-size:32px}
+  .menu-title{font-size:32px}
+  .menu-ubao{width:90px;height:90px}
+}
+@media(max-width:340px){
+  .holes{gap:8px;padding:0 8px}
+  .mc,.mole{width:60px;height:60px}
+}
+@media(min-width:600px){
+  .holes{max-width:480px}
+  .login-box,.res-card{max-width:440px}
+}
+/* Mobile portrait optimization */
+@media(orientation:portrait) and (max-height:700px){
+  .holes{gap:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- LANGUAGE TOGGLE (always visible except in-game) -->
+<div class="lang-toggle" id="langToggle">
+  <button id="btnEN" onclick="setLang('en')">EN</button>
+  <button id="btnZH" onclick="setLang('zh')" class="on">中文</button>
+</div>
+
+<div class="stars" id="starsEl"></div>
+<div class="hmr" id="hmrEl"></div>
+<div class="hit-flash" id="flashEl"></div>
+<div class="toast" id="toastEl"></div>
+
+<!-- ===== UBAO SVG TEMPLATE (reused) ===== -->
+<svg style="display:none">
+<defs>
+<symbol id="ubao" viewBox="0 0 100 100">
+  <ellipse cx="50" cy="72" rx="28" ry="24" fill="#e8f5e9"/>
+  <ellipse cx="50" cy="76" rx="26" ry="20" fill="#4CAF50"/>
+  <ellipse cx="50" cy="78" rx="16" ry="14" fill="#e8f5e9"/>
+  <path d="M36 64 Q50 58 64 64 Q58 72 50 74 Q42 72 36 64Z" fill="#81C784"/>
+  <ellipse cx="50" cy="44" rx="26" ry="24" fill="#FFCCBC"/>
+  <path d="M24 44 Q24 20 50 18 Q76 20 76 44 Q76 32 50 28 Q24 32 24 44Z" fill="#43A047"/>
+  <ellipse cx="26" cy="36" rx="7" ry="8" fill="#43A047"/>
+  <ellipse cx="74" cy="36" rx="7" ry="8" fill="#43A047"/>
+  <ellipse cx="26" cy="36" rx="4" ry="5" fill="#66BB6A"/>
+  <ellipse cx="74" cy="36" rx="4" ry="5" fill="#66BB6A"/>
+  <ellipse cx="34" cy="50" rx="7" ry="5" fill="#FFAB91" opacity=".7"/>
+  <ellipse cx="66" cy="50" rx="7" ry="5" fill="#FFAB91" opacity=".7"/>
+  <ellipse cx="41" cy="44" rx="5" ry="5.5" fill="#1a1a1a"/>
+  <ellipse cx="59" cy="44" rx="5" ry="5.5" fill="#1a1a1a"/>
+  <ellipse cx="42.5" cy="42.5" rx="2" ry="2" fill="#fff"/>
+  <ellipse cx="60.5" cy="42.5" rx="2" ry="2" fill="#fff"/>
+  <path d="M37 39 Q41 37 45 39" stroke="#333" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path d="M55 39 Q59 37 63 39" stroke="#333" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path d="M42 54 Q50 60 58 54" stroke="#c0392b" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="22" cy="68" rx="8" ry="10" fill="#e8f5e9" transform="rotate(-20 22 68)"/>
+  <ellipse cx="78" cy="68" rx="8" ry="10" fill="#e8f5e9" transform="rotate(20 78 68)"/>
+</symbol>
+</defs>
+</svg>
+
+<!-- LOGIN -->
+<div class="screen" id="loginScreen">
+<div class="login-box">
+  <div class="mascot-hero">
+    <svg class="ubao-svg"><use href="#ubao"/></svg>
+    <div class="logo-title">Smash Fever</div>
+    <div class="logo-sub" data-i18n="login_tag">U宝 Edition · Hit & Win RM88!</div>
+  </div>
+  <div class="form-group">
+    <label class="form-label" data-i18n="login_name">Your Name</label>
+    <input class="form-input" id="iName" type="text" autocomplete="name" data-i18n-ph="login_name_ph">
+  </div>
+  <div class="form-group">
+    <label class="form-label" data-i18n="login_phone">Phone Number</label>
+    <input class="form-input" id="iPhone" type="tel" autocomplete="tel" data-i18n-ph="login_phone_ph">
+  </div>
+  <div class="ref-box" id="refBox">
+    <div class="form-label" data-i18n="login_refcode" style="margin-bottom:6px">Referral Code</div>
+    <input class="form-input" id="iRef" data-i18n-ph="login_ref_ph" style="margin:0">
+  </div>
+  <button class="btn-play" onclick="doLogin()" data-i18n="login_play">🎮 Let's Play!</button>
+  <div class="switch-link" style="margin-top:12px"><span data-i18n="login_haveref">Have a referral code?</span> <span onclick="toggleRef()" data-i18n="login_clickenter">Enter it here</span></div>
+</div>
+</div>
+
+<!-- MENU -->
+<div class="screen hidden" id="menuScreen">
+  <div class="menu-mascot-wrap" onclick="mascotTalk()">
+    <svg class="menu-ubao"><use href="#ubao"/></svg>
+  </div>
+  <div class="menu-title">Smash Fever</div>
+  <div class="menu-sub" id="menuSub" data-i18n="menu_ready">Ready to smash?</div>
+
+  <div class="player-card">
+    <div class="p-avatar">🐸</div>
+    <div style="flex:1">
+      <div class="p-name" id="pcName">—</div>
+      <div class="p-stats" id="pcStats"></div>
+    </div>
+    <div class="rm-badge" id="pcRM">RM0</div>
+  </div>
+
+  <div class="progress-card" id="progressCard">
+    <div class="progress-head">
+      <span class="progress-label" data-i18n="prog_label">Progress to RM88</span>
+      <span class="progress-val" id="progressVal">0 / 88,888</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-sub" id="progressSub"></div>
+  </div>
+
+  <div class="daily-row" onclick="claimBonus()" id="bonusRow">
+    <span style="font-size:26px">🎁</span>
+    <div style="flex:1">
+      <div style="font-weight:800;font-size:14px;color:var(--gold)" data-i18n="menu_daily">Daily Login Bonus</div>
+      <div style="font-size:12px;color:var(--muted)" id="bonusSub" data-i18n="menu_daily_claim">Claim 50–100 free points!</div>
+    </div>
+    <div style="background:linear-gradient(135deg,#FFB300,#FF6D00);border-radius:16px;padding:4px 12px;font-size:12px;font-weight:800;color:#fff" id="bonusBadge" data-i18n="menu_claim">Claim!</div>
+  </div>
+
+  <div class="ref-row-btn" onclick="openInvite()">
+    <span style="font-size:22px">🔗</span>
+    <div style="flex:1">
+      <div style="font-weight:800;font-size:14px" data-i18n="menu_invite_title">Invite Friends, Earn RM8!</div>
+      <div style="font-size:12px;color:var(--muted)" id="refLine"></div>
+    </div>
+    <span style="color:var(--muted);font-size:22px">›</span>
+  </div>
+
+  <div class="menu-grid">
+    <div class="m-btn big" onclick="gotoWeapon()">
+      <span class="mi">🎯</span>
+      <div>
+        <div class="ml" data-i18n="menu_play">PLAY NOW</div>
+        <div class="md" style="color:rgba(255,255,255,.6)" data-i18n="menu_play_sub">Start smashing!</div>
+      </div>
+    </div>
+    <div class="m-btn" onclick="showLB()">
+      <span class="mi">🏆</span>
+      <span class="ml" data-i18n="menu_lb">Leaderboard</span>
+      <span class="md" data-i18n="menu_lb_sub">Top players</span>
+    </div>
+    <div class="m-btn" onclick="showScreen('weaponScreen')">
+      <span class="mi">🔨</span>
+      <span class="ml" data-i18n="menu_weapons">Weapons</span>
+      <span class="md" data-i18n="menu_weapons_sub">Pick your skin</span>
+    </div>
+  </div>
+
+  <div style="margin-top:14px;position:relative;z-index:1;display:flex;gap:10px">
+    <button class="bk" onclick="tryAdmin()" data-i18n="menu_admin">🔐 Admin Panel</button>
+    <button class="bk" onclick="doLogout()" style="color:#EF9A9A" data-i18n="menu_logout">↩ Logout</button>
+  </div>
+  <div style="height:75px"></div>
+</div>
+
+<!-- WEAPON -->
+<div class="screen hidden" id="weaponScreen">
+  <div class="stitle" data-i18n="w_title">⚔️ Choose Weapon</div>
+  <div class="ssub" data-i18n="w_sub">Your smashing style matters!</div>
+  <div class="wgrid">
+    <div class="wcard on" onclick="pickWeapon(0)">
+      <span class="wi">🔨</span><span class="wn" data-i18n="w0_name">Wood Hammer</span><span class="wd" data-i18n="w0_desc">Classic reliable</span>
+    </div>
+    <div class="wcard" onclick="pickWeapon(1)">
+      <span class="wi">⚡</span><span class="wn" data-i18n="w1_name">Thunder Bolt</span><span class="wd" data-i18n="w1_desc">Shocking damage!</span>
+    </div>
+    <div class="wcard" onclick="pickWeapon(2)">
+      <span class="wi">🔩</span><span class="wn" data-i18n="w2_name">Metal Crusher</span><span class="wd" data-i18n="w2_desc">Heavy impact</span>
+    </div>
+    <div class="wcard" onclick="pickWeapon(3)">
+      <span class="wi">🐟</span><span class="wn" data-i18n="w3_name">Silly Fish</span><span class="wd" data-i18n="w3_desc">Maximum LOL</span>
+    </div>
+  </div>
+
+  <div class="upload-wrap">
+    <div class="upload-box" onclick="document.getElementById('tUpload').click()">
+      <input type="file" id="tUpload" accept="image/*" multiple style="display:none" onchange="handleUpload(event)">
+      <div style="font-size:28px;margin-bottom:4px">😈</div>
+      <div style="font-weight:800;margin-bottom:3px" data-i18n="w_upload_title">Add Custom Target!</div>
+      <div style="font-size:12px;color:var(--muted)" data-i18n="w_upload_sub">Upload a face → special +100pt mole!</div>
+    </div>
+    <div class="custom-thumbs" id="cThumbs"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-back" onclick="showScreen('menuScreen')" data-i18n="btn_back">← Back</button>
+    <button class="btn-go" onclick="startCD()" data-i18n="btn_start">🎯 Start Game!</button>
+  </div>
+</div>
+
+<!-- COUNTDOWN -->
+<div id="cdOverlay" class="hidden" style="display:none">
+  <div class="cd-num" id="cdNum">3</div>
+  <div class="cd-label" data-i18n="cd_label">Get Ready to SMASH!</div>
+</div>
+
+<!-- GAME -->
+<div class="screen hidden" id="gameScreen">
+  <div class="hud">
+    <div class="hud-block">
+      <div class="hud-lbl" data-i18n="hud_score">Score</div>
+      <div class="hud-val" id="hScore">0</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-lbl" data-i18n="hud_time">Time</div>
+      <div class="hud-val lg" id="hTime">60</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-lbl" data-i18n="hud_best">Best</div>
+      <div class="hud-val sm" id="hBest">0</div>
+    </div>
+  </div>
+  <div class="combo-hud hidden" id="comboEl"></div>
+
+  <div class="field" id="fieldEl">
+    <div class="grass"></div>
+    <div class="holes" id="holesEl"></div>
+    <div class="guide">
+      <svg width="44" height="44"><use href="#ubao"/></svg>
+      <div class="guide-bubble" id="guideEl">Smash them! 💪</div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen hidden" id="resultsScreen">
+<div class="res-card">
+  <svg class="res-mascot" id="resMascot" width="90" height="90"><use href="#ubao"/></svg>
+  <div class="res-title" id="resTitle"></div>
+  <div class="res-score" id="resScore">0</div>
+  <div style="font-size:13px;color:var(--muted)" data-i18n="res_total">Total Points</div>
+  <div class="res-stats" id="resStats"></div>
+  <div id="rewardEl" class="reward-box rm88 hidden">
+    <span class="reward-icon" id="rewardIcon">🎉</span>
+    <div>
+      <div class="reward-title" id="rewardTitle"></div>
+      <div class="reward-sub" id="rewardSub"></div>
+    </div>
+  </div>
+  <div class="share-box" onclick="doShare()">
+    <div class="share-title" data-i18n="res_share_title">📤 Share Your Battle Card!</div>
+    <div class="share-text" id="shareTextEl"></div>
+  </div>
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn-back" onclick="showScreen('menuScreen');updateMenuUI()" data-i18n="btn_menu">🏠 Menu</button>
+    <button class="btn-go" onclick="startCD()" data-i18n="btn_again">🔄 Play Again!</button>
+  </div>
+</div>
+</div>
+
+<!-- LB -->
+<div class="screen hidden" id="lbScreen" style="padding-bottom:30px">
+  <div class="hdr-row">
+    <button class="bk" onclick="showScreen('menuScreen')" data-i18n="btn_back">← Back</button>
+    <div class="stitle" style="margin:0" data-i18n="lb_title">🏆 Leaderboard</div>
+  </div>
+  <div id="lbList" style="width:100%;max-width:420px"></div>
+</div>
+
+<!-- ADMIN -->
+<div class="screen hidden" id="adminScreen" style="flex-direction:column;align-items:stretch">
+  <div class="admin-hdr">
+    <button class="bk" onclick="showScreen('menuScreen')" data-i18n="btn_exit">← Exit</button>
+    <div class="admin-t" data-i18n="admin_title">🔐 Admin Dashboard</div>
+  </div>
+  <div class="admin-body">
+    <div class="tabs">
+      <div class="tab on" onclick="adminTab('overview',this)" data-i18n="tab_overview">Overview</div>
+      <div class="tab" onclick="adminTab('players',this)" data-i18n="tab_players">Players</div>
+      <div class="tab" onclick="adminTab('leaderboard',this)" data-i18n="tab_lb">Leaderboard</div>
+      <div class="tab" onclick="adminTab('rewards',this)" data-i18n="tab_rewards">Rewards</div>
+    </div>
+    <div id="adminBody"></div>
+  </div>
+</div>
+
+<!-- INVITE MODAL -->
+<div class="modal-ov hidden" id="invModal" onclick="if(event.target===this)this.classList.add('hidden')">
+  <div class="modal-box">
+    <div class="modal-t" data-i18n="inv_title">🔗 Invite & Earn!</div>
+    <div class="modal-s" data-i18n="inv_sub">Share your code · earn RM8 per friend · max RM88!</div>
+    <div class="code-box">
+      <div class="code-val" id="myCode">UBAO-????</div>
+      <div class="code-sub" data-i18n="inv_code_sub">Your personal invite code</div>
+    </div>
+    <div class="tier-list">
+      <div class="tier"><span class="tier-l" data-i18n="inv_t1">🎯 Cumulative 88,888+ pts</span><span class="tier-r" data-i18n="inv_r1">RM88 credit</span></div>
+      <div class="tier"><span class="tier-l" data-i18n="inv_t2">👥 Per friend registered</span><span class="tier-r" data-i18n="inv_r2">+RM8</span></div>
+      <div class="tier"><span class="tier-l" data-i18n="inv_t3">🏆 Maximum total reward</span><span class="tier-r" data-i18n="inv_r3">RM88</span></div>
+    </div>
+    <button class="btn-copy" onclick="copyCode()" data-i18n="inv_copy">📋 Copy Invite Code + Link</button>
+    <button class="btn-close" onclick="document.getElementById('invModal').classList.add('hidden')" data-i18n="btn_close">Close</button>
+  </div>
+</div>
+
+<script>
+// =================== I18N ===================
+const I18N = {
+  en: {
+    login_tag: "U宝 Edition · Hit & Win RM88!",
+    login_name: "Your Name",
+    login_name_ph: "e.g. Ahmad / Li Ming",
+    login_phone: "Phone Number",
+    login_phone_ph: "e.g. 0123456789",
+    login_refcode: "Referral Code",
+    login_ref_ph: "e.g. UBAO-AB1234",
+    login_play: "🎮 Let's Play!",
+    login_haveref: "Have a referral code?",
+    login_clickenter: "Enter it here",
+    menu_ready: "Ready to smash?",
+    menu_ready_hi: "Hey {name}! Ready to SMASH? 💪",
+    menu_stats: "Best: {best} pts · {games} games",
+    menu_daily: "Daily Login Bonus",
+    menu_daily_claim: "Claim 50–100 free points!",
+    menu_daily_done: "Come back tomorrow for more!",
+    menu_claim: "Claim!",
+    menu_claimed: "✓ Done",
+    menu_invite_title: "Invite Friends, Earn RM8!",
+    menu_invite_line: "{n} referrals · Max RM88 total",
+    menu_play: "PLAY NOW",
+    menu_play_sub: "Start smashing!",
+    menu_lb: "Leaderboard",
+    menu_lb_sub: "Top players",
+    menu_weapons: "Weapons",
+    menu_weapons_sub: "Pick your skin",
+    menu_admin: "🔐 Admin Panel",
+    menu_logout: "↩ Logout",
+    w_title: "⚔️ Choose Weapon",
+    w_sub: "Your smashing style matters!",
+    w0_name: "Wood Hammer", w0_desc: "Classic reliable",
+    w1_name: "Thunder Bolt", w1_desc: "Shocking damage!",
+    w2_name: "Metal Crusher", w2_desc: "Heavy impact",
+    w3_name: "Silly Fish", w3_desc: "Maximum LOL",
+    w_upload_title: "Add Custom Target!",
+    w_upload_sub: "Upload a face → special +100pt mole!",
+    btn_back: "← Back",
+    btn_start: "🎯 Start Game!",
+    cd_label: "Get Ready to SMASH!",
+    hud_score: "Score", hud_time: "Time", hud_best: "Best",
+    res_total: "Total Points",
+    res_hits: "Hits", res_combo: "Best Combo", res_acc: "Accuracy",
+    res_share_title: "📤 Share Your Battle Card!",
+    res_share_text: '"My score: {score} pts · Beat me! 😤"',
+    btn_menu: "🏠 Menu",
+    btn_again: "🔄 Play Again!",
+    btn_exit: "← Exit",
+    btn_close: "Close",
+    lb_title: "🏆 Leaderboard",
+    lb_empty: "No players yet!",
+    admin_title: "🔐 Admin Dashboard",
+    tab_overview: "Overview", tab_players: "Players", tab_lb: "Leaderboard", tab_rewards: "Rewards",
+    inv_title: "🔗 Invite & Earn!",
+    inv_sub: "Share your code · earn RM8 per friend · max RM88!",
+    inv_code_sub: "Your personal invite code",
+    inv_t1: "🎯 Cumulative 88,888+ pts", inv_r1: "RM88 credit",
+    inv_t2: "👥 Per friend registered", inv_r2: "+RM8",
+    inv_t3: "🏆 Maximum total reward", inv_r3: "RM88",
+    inv_copy: "📋 Copy Invite Code + Link",
+    // Toasts
+    t_no_name: "Please enter your name 😊",
+    t_bad_phone: "Enter a valid phone number 📱",
+    t_welcome_new: "Welcome {name}! Let's SMASH! 🎉",
+    t_welcome_back: "Welcome back, {name}! 🐸",
+    t_already_bonus: "Already claimed today! 🌟",
+    t_bonus_got: "🎁 Daily Bonus! +{n} pts!",
+    t_rm88_unlock: "🎉 88,888 total pts! RM88 unlocked!",
+    t_rm88_after: "🎉 AMAZING! RM88 credit is yours!",
+    t_copied: "📋 Copied! Send to your friends!",
+    t_share_copied: "📋 Battle card copied! Share away!",
+    t_wrong_pw: "Wrong password ❌",
+    t_admin_pw: "Admin Password:",
+    // Progress card
+    prog_label: "Progress to RM88",
+    prog_remaining: "Need {n} more cumulative pts!",
+    prog_unlocked: "🎉 RM88 Reward Unlocked!",
+    // Game text
+    g_miss: "Miss!",
+    g_smash: "Smash them all!",
+    g_gold: "Go for the GOLD! 🌟",
+    g_combo: "Combo = more points! ⚡",
+    g_enemy: "Hit U宝's enemies! 😤",
+    g_888: "Total 88,888 = RM88! 🎯",
+    g_fever: "FEVER MODE active! 🔥",
+    g_almost: "Almost at 88,888! Keep going! 🎯",
+    g_fever_now: "FEVER MODE! 🔥🔥🔥",
+    g_combo_now: "COMBO x{n}! ⚡",
+    g_last: "LAST SECONDS! 🏃",
+    g_hurry: "Hurry! ⏰",
+    g_smash_short: "Smash them! 💪",
+    // result titles
+    r_t0: "Keep Practicing! 😅",
+    r_t1: "Not Bad! 😊",
+    r_t2: "Good Job! 😄",
+    r_t3: "Awesome! 🤩",
+    r_t4: "AMAZING! 🔥",
+    r_t5: "LEGENDARY! 🏆👑",
+    r_rm88_title: "🎉 RM88 Reward Unlocked!",
+    r_rm88_sub: "RM88 free credit added! Contact support to claim.",
+    r_keep_title: "📊 Keep Smashing!",
+    r_keep_sub: "Need {n} more cumulative pts for RM88!",
+    // mascot
+    m1: "Smash them ALL! 💪", m2: "Target: 88,888 total pts! 🎯", m3: "Golden mole = 50pts! 🌟",
+    m4: "COMBO for triple score! ⚡", m5: "I believe in you! 💚", m6: "You are the best smasher! 🏆",
+    // admin
+    a_total: "Total Players", a_dau: "Daily Active", a_games: "Games Played",
+    a_avg: "Avg Score", a_rm88: "RM88 Claimed", a_refs: "Total Referrals",
+    a_top10: "TOP 10 LEADERBOARD",
+    a_search: "🔍 Search by name or phone...",
+    a_rm88_unlock: "RM88 Unlocked", a_active_ref: "Active Referrers", a_payout: "Est. Total Payouts",
+    a_th_rank: "Rank", a_th_name: "Name", a_th_phone: "Phone", a_th_high: "High Score",
+    a_th_total: "Total", a_th_games: "Games", a_th_refs: "Refs", a_th_joined: "Joined",
+    a_th_best: "Best", a_th_status: "Status", a_th_rmbonus: "Ref Bonus", a_th_rewards_total: "Total",
+    a_norewards: "No rewards yet",
+    a_active: "Active",
+    a_no_players: "No players yet",
+    // share
+    share_msg: "🐸 Smash Fever — U宝 Edition!\n🎯 I scored {score} pts!\n⚡ Best combo: {combo}x\n🏆 Can you beat me?\n\nJoin & win RM88! Code: UBAO-{code}",
+    invite_msg: "🐸 Join Smash Fever & win RM88!\nUse my code: {code}\nEvery friend you invite = RM8!\nPlay now and SMASH to WIN!",
+  },
+  zh: {
+    login_tag: "U宝特别版 · 击打赢取 RM88！",
+    login_name: "你的名字",
+    login_name_ph: "例如：李明 / Ahmad",
+    login_phone: "电话号码",
+    login_phone_ph: "例如：0123456789",
+    login_refcode: "推荐码",
+    login_ref_ph: "例如：UBAO-AB1234",
+    login_play: "🎮 立即开玩！",
+    login_haveref: "有推荐码吗？",
+    login_clickenter: "点击输入",
+    menu_ready: "准备好了吗？",
+    menu_ready_hi: "嘿 {name}！准备打地鼠了吗？💪",
+    menu_stats: "最高分：{best} · 已玩 {games} 局",
+    menu_daily: "每日登录奖励",
+    menu_daily_claim: "免费领取 50-100 积分！",
+    menu_daily_done: "明天再来领取更多！",
+    menu_claim: "领取！",
+    menu_claimed: "✓ 已领",
+    menu_invite_title: "邀请朋友，赚取 RM8！",
+    menu_invite_line: "已邀请 {n} 人 · 最高 RM88",
+    menu_play: "立即游戏",
+    menu_play_sub: "开始打地鼠！",
+    menu_lb: "排行榜",
+    menu_lb_sub: "顶尖玩家",
+    menu_weapons: "武器选择",
+    menu_weapons_sub: "选择皮肤",
+    menu_admin: "🔐 管理后台",
+    menu_logout: "↩ 登出",
+    w_title: "⚔️ 选择武器",
+    w_sub: "你的打击风格很重要！",
+    w0_name: "木锤", w0_desc: "经典可靠",
+    w1_name: "电光锤", w1_desc: "震撼电击！",
+    w2_name: "金属重锤", w2_desc: "重击效果",
+    w3_name: "搞笑鱼锤", w3_desc: "搞笑无极限",
+    w_upload_title: "上传自定义目标！",
+    w_upload_sub: "上传一张脸 → 变成 +100 分特殊地鼠！",
+    btn_back: "← 返回",
+    btn_start: "🎯 开始游戏！",
+    cd_label: "准备好打地鼠！",
+    hud_score: "得分", hud_time: "时间", hud_best: "最佳",
+    res_total: "总得分",
+    res_hits: "击中", res_combo: "最佳连击", res_acc: "准确率",
+    res_share_title: "📤 分享你的战绩卡片！",
+    res_share_text: '"我的得分：{score} · 来挑战我！😤"',
+    btn_menu: "🏠 菜单",
+    btn_again: "🔄 再来一局！",
+    btn_exit: "← 退出",
+    btn_close: "关闭",
+    lb_title: "🏆 排行榜",
+    lb_empty: "暂无玩家！",
+    admin_title: "🔐 管理后台",
+    tab_overview: "总览", tab_players: "玩家", tab_lb: "排行榜", tab_rewards: "奖励",
+    inv_title: "🔗 邀请赚奖励！",
+    inv_sub: "分享你的代码 · 每位朋友 RM8 · 最高 RM88！",
+    inv_code_sub: "你的专属邀请码",
+    inv_t1: "🎯 累积得分 88,888+", inv_r1: "RM88 现金奖励",
+    inv_t2: "👥 每邀请 1 位朋友", inv_r2: "+RM8",
+    inv_t3: "🏆 最高累积奖励", inv_r3: "RM88",
+    inv_copy: "📋 复制邀请码与链接",
+    t_no_name: "请输入你的名字 😊",
+    t_bad_phone: "请输入有效的电话号码 📱",
+    t_welcome_new: "欢迎 {name}！开始打地鼠吧！🎉",
+    t_welcome_back: "欢迎回来，{name}！🐸",
+    t_already_bonus: "今天已领取过了！明天再来 🌟",
+    t_bonus_got: "🎁 每日奖励！+{n} 积分！",
+    t_rm88_unlock: "🎉 累积 88,888 分！RM88 已解锁！",
+    t_rm88_after: "🎉 太棒了！RM88 奖励是你的了！",
+    t_copied: "📋 已复制！发送给你的朋友吧！",
+    t_share_copied: "📋 战绩卡片已复制！快去分享！",
+    t_wrong_pw: "密码错误 ❌",
+    t_admin_pw: "管理员密码：",
+    prog_label: "RM88 奖励进度",
+    prog_remaining: "还差 {n} 分累积解锁！",
+    prog_unlocked: "🎉 RM88 奖励已解锁！",
+    g_miss: "未中！",
+    g_smash: "全部打掉它们！",
+    g_gold: "瞄准金色 U宝！🌟",
+    g_combo: "连击 = 更多积分！⚡",
+    g_enemy: "击败 U宝的敌人！😤",
+    g_888: "累积 88,888 = RM88！🎯",
+    g_fever: "狂热模式启动！🔥",
+    g_almost: "快达到 88,888 了！加油！🎯",
+    g_fever_now: "狂热模式！🔥🔥🔥",
+    g_combo_now: "连击 x{n}！⚡",
+    g_last: "最后几秒！🏃",
+    g_hurry: "快！时间不多了！⏰",
+    g_smash_short: "打他们！💪",
+    r_t0: "继续努力！😅",
+    r_t1: "不错哦！😊",
+    r_t2: "干得好！😄",
+    r_t3: "太棒了！🤩",
+    r_t4: "惊人！🔥",
+    r_t5: "传奇！🏆👑",
+    r_rm88_title: "🎉 RM88 奖励已解锁！",
+    r_rm88_sub: "RM88 已加入账户！联系客服领取。",
+    r_keep_title: "📊 继续努力！",
+    r_keep_sub: "还需累积 {n} 分即可解锁 RM88！",
+    m1: "全部打掉它们！💪", m2: "目标：累积 88,888 分！🎯", m3: "金色 U宝 = 50 分！🌟",
+    m4: "连击得三倍分！⚡", m5: "我相信你！💚", m6: "你是最强打手！🏆",
+    a_total: "总玩家数", a_dau: "日活跃用户", a_games: "总局数",
+    a_avg: "平均分", a_rm88: "RM88 已领取", a_refs: "总推荐数",
+    a_top10: "前 10 名排行",
+    a_search: "🔍 搜索姓名或电话...",
+    a_rm88_unlock: "RM88 已解锁", a_active_ref: "活跃推荐人", a_payout: "预计总支出",
+    a_th_rank: "排名", a_th_name: "姓名", a_th_phone: "电话", a_th_high: "最高分",
+    a_th_total: "总分", a_th_games: "局数", a_th_refs: "推荐", a_th_joined: "加入日期",
+    a_th_best: "最佳", a_th_status: "状态", a_th_rmbonus: "推荐奖励", a_th_rewards_total: "总额",
+    a_norewards: "暂无奖励",
+    a_active: "活跃",
+    a_no_players: "暂无玩家",
+    share_msg: "🐸 Smash Fever — U宝特别版！\n🎯 我得了 {score} 分！\n⚡ 最佳连击：{combo}x\n🏆 你能超越我吗？\n\n加入赢取 RM88！邀请码：UBAO-{code}",
+    invite_msg: "🐸 加入 Smash Fever，赢取 RM88！\n使用我的推荐码：{code}\n每邀请一位朋友 = RM8！\n现在就来打地鼠 WIN 大奖！",
+  }
+};
+
+let LANG = 'zh';
+
+function t(key, params){
+  let s = (I18N[LANG] && I18N[LANG][key]) || I18N.en[key] || key;
+  if(params){
+    Object.keys(params).forEach(k=>{
+      s = s.replace(new RegExp('\\{'+k+'\\}','g'), params[k]);
+    });
+  }
+  return s;
+}
+
+function setLang(lang){
+  LANG = lang;
+  document.body.classList.toggle('lang-zh', lang==='zh');
+  document.documentElement.lang = lang;
+  document.getElementById('btnEN').classList.toggle('on', lang==='en');
+  document.getElementById('btnZH').classList.toggle('on', lang==='zh');
+  applyI18n();
+  if(CU) updateMenuUI();
+  try{ localStorage.setItem('sf_lang', lang); }catch{}
+}
+
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    el.textContent = t(key);
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-ph');
+    el.setAttribute('placeholder', t(key));
+  });
+}
+
+// =================== SOUND ===================
+const AC = window.AudioContext || window.webkitAudioContext;
+let ac = null;
+function getAC(){if(!ac){try{ac=new AC()}catch(e){}}return ac;}
+function playTone(freq,type,dur,vol=0.3,delay=0){
+  const a=getAC();if(!a)return;
+  try{
+    const o=a.createOscillator(),g=a.createGain();
+    o.connect(g);g.connect(a.destination);
+    o.type=type;o.frequency.setValueAtTime(freq,a.currentTime+delay);
+    g.gain.setValueAtTime(vol,a.currentTime+delay);
+    g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+delay+dur);
+    o.start(a.currentTime+delay);o.stop(a.currentTime+delay+dur);
+  }catch(e){}
+}
+function sfxHit(pts){const f=pts>=100?800:pts>=50?600:440;playTone(f,'square',.08,.25);playTone(f*1.5,'sine',.12,.15,.05);}
+function sfxCombo(){[523,659,784,1047].forEach((f,i)=>playTone(f,'sine',.15,.2,i*.07));}
+function sfxMiss(){playTone(200,'sawtooth',.15,.1);}
+function sfxTick(){playTone(880,'sine',.05,.15);}
+function sfxGameOver(){[523,440,349,261].forEach((f,i)=>playTone(f,'sine',.25,.3,i*.18));}
+function sfxUnlock(){[523,659,784,1047,1319].forEach((f,i)=>playTone(f,'sine',.2,.3,i*.1));}
+function sfxBonus(){[440,554,659,880].forEach((f,i)=>playTone(f,'sine',.15,.25,i*.08));}
+
+// =================== DB ===================
+const DB={
+  get(k){try{return JSON.parse(localStorage.getItem('sf_'+k))}catch{return null}},
+  set(k,v){try{localStorage.setItem('sf_'+k,JSON.stringify(v))}catch{}},
+  players(){return this.get('players')||{}},
+  savePlayers(p){this.set('players',p)},
+  games(){return this.get('games')||[]},
+  addGame(g){const gs=this.games();gs.push(g);if(gs.length>500)gs.shift();this.set('games',gs)},
+};
+
+// =================== STATE ===================
+let CU=null, weapon=0, customImgs=[];
+let gActive=false,score=0,timeLeft=60,gTimer=null,moleTimers=[];
+let combo=0,comboTm=null,maxCombo=0,hits=0,misses=0,totalSpawn=0;
+let gameStartTotal=0;
+const TARGET=88888;
+const WEAPONS=['🔨','⚡','🔩','🐟'];
+let guideIdx=0;
+
+// =================== STARS ===================
+(()=>{
+  const c=document.getElementById('starsEl');
+  for(let i=0;i<70;i++){
+    const s=document.createElement('div');s.className='star';
+    s.style.cssText=`width:${Math.random()*2.5+.5}px;height:${Math.random()*2.5+.5}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s`;
+    c.appendChild(s);
+  }
+})();
+
+// =================== NAV ===================
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  const el=document.getElementById(id);el.classList.remove('hidden');el.scrollTop=0;
+  // Hide lang toggle in game
+  document.getElementById('langToggle').classList.toggle('in-game', id==='gameScreen');
+}
+
+// =================== LOGIN ===================
+let refShown=false;
+function toggleRef(){refShown=!refShown;document.getElementById('refBox').style.display=refShown?'block':'none';}
+
+function doLogin(){
+  const name=document.getElementById('iName').value.trim();
+  const phone=document.getElementById('iPhone').value.trim().replace(/\D/g,'');
+  if(!name){toast(t('t_no_name'));return;}
+  if(phone.length<8){toast(t('t_bad_phone'));return;}
+
+  const players=DB.players();
+  if(!players[phone]){
+    const ref=(document.getElementById('iRef').value||'').trim().toUpperCase().replace('UBAO-','');
+    if(ref){
+      const refP=Object.values(players).find(p=>p.code===ref);
+      if(refP){
+        refP.refs=(refP.refs||0)+1;
+        refP.refRew=Math.min((refP.refs*8),88); // RM8 per referral, max RM88
+        players[refP.phone]=refP;
+      }
+    }
+    players[phone]={
+      id:phone,name,phone,totalScore:0,best:0,games:0,
+      refs:0,refRew:0,rm88:false,refBy:ref||null,
+      code:mkCode(name),joined:Date.now(),lastLogin:Date.now(),lastBonus:0
+    };
+    toast(t('t_welcome_new',{name}));
+  } else {
+    players[phone].lastLogin=Date.now();
+    toast(t('t_welcome_back',{name:players[phone].name}));
+  }
+  DB.savePlayers(players);
+  DB.set('sess',phone);
+  CU=players[phone];
+  showScreen('menuScreen');
+  updateMenuUI();
+}
+
+function mkCode(name){
+  return name.replace(/[\s\u4e00-\u9fa5]/g,'').substring(0,3).toUpperCase().padEnd(3,'X')+Math.floor(1000+Math.random()*9000);
+}
+
+function doLogout(){DB.set('sess',null);CU=null;showScreen('loginScreen');}
+
+// =================== MENU ===================
+function updateMenuUI(){
+  if(!CU)return;
+  document.getElementById('menuSub').textContent=t('menu_ready_hi',{name:CU.name});
+  document.getElementById('pcName').textContent=CU.name;
+  document.getElementById('pcStats').textContent=t('menu_stats',{best:(CU.best||0).toLocaleString(),games:CU.games||0});
+  const total=Math.min((CU.rm88?88:0)+(CU.refRew||0), 88);
+  document.getElementById('pcRM').textContent='RM'+total;
+  document.getElementById('refLine').textContent=t('menu_invite_line',{n:CU.refs||0});
+  document.getElementById('myCode').textContent='UBAO-'+(CU.code||'????');
+
+  // Progress bar
+  const ts=CU.totalScore||0;
+  const pct=Math.min(100,(ts/TARGET*100));
+  document.getElementById('progressVal').textContent=ts.toLocaleString()+' / 88,888';
+  const fill=document.getElementById('progressFill');
+  fill.style.width=pct+'%';
+  const card=document.getElementById('progressCard');
+  const sub=document.getElementById('progressSub');
+  if(CU.rm88||ts>=TARGET){
+    card.classList.add('unlocked');
+    fill.classList.add('full');
+    sub.classList.add('done');
+    sub.textContent=t('prog_unlocked');
+  } else {
+    card.classList.remove('unlocked');
+    fill.classList.remove('full');
+    sub.classList.remove('done');
+    sub.textContent=t('prog_remaining',{n:(TARGET-ts).toLocaleString()});
+  }
+
+  const today=new Date().toDateString();
+  const isToday = new Date(CU.lastBonus||0).toDateString()===today;
+  document.getElementById('bonusSub').textContent = isToday ? t('menu_daily_done') : t('menu_daily_claim');
+  document.getElementById('bonusBadge').textContent = isToday ? t('menu_claimed') : t('menu_claim');
+  document.getElementById('bonusBadge').style.background = isToday ? 'rgba(255,255,255,.1)' : 'linear-gradient(135deg,#FFB300,#FF6D00)';
+}
+
+function mascotTalk(){
+  const msgs=['m1','m2','m3','m4','m5','m6'].map(k=>t(k));
+  toast(msgs[Math.floor(Math.random()*msgs.length)]);
+}
+
+function claimBonus(){
+  if(!CU)return;
+  const today=new Date().toDateString();
+  if(new Date(CU.lastBonus||0).toDateString()===today){toast(t('t_already_bonus'));return;}
+  const bonus=50+Math.floor(Math.random()*51);
+  CU.totalScore=(CU.totalScore||0)+bonus;
+  CU.lastBonus=Date.now();
+  const players=DB.players();players[CU.phone]=CU;DB.savePlayers(players);
+  sfxBonus();
+  toast(t('t_bonus_got',{n:bonus}));
+  updateMenuUI();
+}
+
+function gotoWeapon(){showScreen('weaponScreen');}
+
+// =================== WEAPON ===================
+function pickWeapon(i){
+  document.querySelectorAll('.wcard').forEach((c,j)=>c.classList.toggle('on',j===i));
+  weapon=i;
+}
+function handleUpload(e){
+  Array.from(e.target.files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{customImgs.push(ev.target.result);renderThumbs();};
+    r.readAsDataURL(f);
+  });
+}
+function renderThumbs(){
+  const c=document.getElementById('cThumbs');c.innerHTML='';
+  customImgs.forEach((src,i)=>{
+    const img=document.createElement('img');
+    img.src=src;img.className='cthumb';
+    img.onclick=()=>{img.classList.toggle('on');};
+    c.appendChild(img);
+  });
+}
+
+// =================== COUNTDOWN ===================
+function startCD(){
+  showScreen('gameScreen');
+  const ov=document.getElementById('cdOverlay');
+  ov.style.display='flex';ov.classList.remove('hidden');
+  let n=3;
+  const numEl=document.getElementById('cdNum');
+  numEl.className='cd-num cd-anim';numEl.textContent=n;
+  const iv=setInterval(()=>{
+    n--;
+    numEl.className='';void numEl.offsetWidth;numEl.className='cd-anim';
+    if(n===0){
+      numEl.className='cd-go cd-anim';numEl.textContent='GO!';
+      sfxCombo();clearInterval(iv);
+      setTimeout(()=>{ov.style.display='none';startGame();},700);
+    } else {
+      numEl.className='cd-num cd-anim';numEl.textContent=n;
+      sfxTick();
+    }
+  },900);
+}
+
+// =================== GAME ===================
+function startGame(){
+  score=0;timeLeft=60;gActive=true;combo=0;hits=0;misses=0;maxCombo=0;totalSpawn=0;
+  gameStartTotal=CU?.totalScore||0;
+  buildHoles();updateHUD();setupHammer();
+  gTimer=setInterval(()=>{
+    timeLeft--;updateHUD();
+    if(timeLeft<=10){
+      document.getElementById('hTime').classList.add('urgent');
+      sfxTick();
+      setGuide(timeLeft<=5?t('g_last'):t('g_hurry'));
+    }
+    if(timeLeft<=0)endGame();
+  },1000);
+  scheduleMoles();
+  setGuide(t('g_smash'));
+}
+
+let holeData=[];
+function buildHoles(){
+  const grid=document.getElementById('holesEl');
+  grid.innerHTML='';holeData=[];
+  for(let i=0;i<9;i++){
+    const h=document.createElement('div');
+    h.className='hole';h.dataset.i=i;
+    h.innerHTML=`<div class="hole-pit"></div><div class="hole-rim"></div><div class="mc" id="mc${i}"></div>`;
+    // Use pointerdown for instant response on mobile/desktop
+    const hitHandler=e=>{
+      if(!gActive)return;
+      e.preventDefault();
+      const hd=holeData[i];
+      if(hd?.up&&!hd.hit){
+        hitMole(hd,i,e.clientX,e.clientY);
+      } else if(!hd?.up){
+        misses++;sfxMiss();
+        showPts(e.clientX,e.clientY,t('g_miss'),'#8fa8c8');
+      }
+    };
+    h.addEventListener('pointerdown',hitHandler,{passive:false});
+    grid.appendChild(h);
+    holeData.push({up:false,hit:false,el:h,type:'normal'});
+  }
+}
+
+function scheduleMoles(){
+  if(!gActive)return;
+  const speed=Math.max(350,1100-(60-timeLeft)*12);
+  moleTimers.push(setTimeout(()=>{if(gActive){spawnMole();scheduleMoles();}},speed+Math.random()*300));
+}
+
+function spawnMole(){
+  const free=holeData.filter(h=>!h.up);
+  if(!free.length)return;
+  const hd=free[Math.floor(Math.random()*free.length)];
+  const i=holeData.indexOf(hd);
+  let type='normal';
+  const r=Math.random();
+  if(customImgs.length&&r<.12)type='custom';
+  else if(r<.09)type='golden';
+  else if(r<.19)type='bad';
+  hd.up=true;hd.hit=false;hd.type=type;totalSpawn++;
+
+  const mc=document.getElementById('mc'+i);mc.innerHTML='';
+  const m=document.createElement('div');m.className='mole popping';
+  m.style.cssText='width:76px;height:76px;display:flex;align-items:center;justify-content:center;';
+  if(type==='custom'){
+    const src=customImgs[Math.floor(Math.random()*customImgs.length)];
+    const img=document.createElement('img');
+    img.src=src;img.style.cssText='width:68px;height:68px;border-radius:50%;object-fit:cover;border:3px solid #F44336;box-shadow:0 0 16px rgba(244,67,54,.6)';
+    m.appendChild(img);
+  } else {
+    m.innerHTML=buildMoleSVG(type);
+  }
+  mc.appendChild(m);hd.mole=m;
+  const upMs=Math.max(700,1900-(score/60)*40);
+  moleTimers.push(setTimeout(()=>{if(hd.up&&!hd.hit)hideMole(hd,i);},upMs));
+}
+
+function buildMoleSVG(type){
+  if(type==='golden') return `<svg width="70" height="70" viewBox="0 0 100 100">
+    <ellipse cx="50" cy="72" rx="28" ry="24" fill="#FFF8E1"/>
+    <ellipse cx="50" cy="76" rx="26" ry="20" fill="#FFB300"/>
+    <ellipse cx="50" cy="78" rx="16" ry="14" fill="#FFF8E1"/>
+    <path d="M36 64 Q50 58 64 64 Q58 72 50 74 Q42 72 36 64Z" fill="#FFD54F"/>
+    <ellipse cx="50" cy="44" rx="26" ry="24" fill="#FFECB3"/>
+    <path d="M24 44 Q24 20 50 18 Q76 20 76 44 Q76 32 50 28 Q24 32 24 44Z" fill="#FF8F00"/>
+    <ellipse cx="26" cy="36" rx="7" ry="8" fill="#FF8F00"/>
+    <ellipse cx="74" cy="36" rx="7" ry="8" fill="#FF8F00"/>
+    <ellipse cx="34" cy="50" rx="7" ry="5" fill="#FFAB40" opacity=".7"/>
+    <ellipse cx="66" cy="50" rx="7" ry="5" fill="#FFAB40" opacity=".7"/>
+    <ellipse cx="41" cy="44" rx="5" ry="5.5" fill="#1a1a1a"/>
+    <ellipse cx="59" cy="44" rx="5" ry="5.5" fill="#1a1a1a"/>
+    <ellipse cx="42.5" cy="42.5" rx="2" ry="2" fill="#fff"/>
+    <ellipse cx="60.5" cy="42.5" rx="2" ry="2" fill="#fff"/>
+    <text x="22" y="22" font-size="14">⭐</text>
+    <text x="68" y="22" font-size="14">⭐</text>
+  </svg>`;
+  if(type==='bad') return `<svg width="70" height="70" viewBox="0 0 100 100">
+    <ellipse cx="50" cy="72" rx="28" ry="24" fill="#FFEBEE"/>
+    <ellipse cx="50" cy="76" rx="26" ry="20" fill="#F44336"/>
+    <ellipse cx="50" cy="78" rx="16" ry="14" fill="#FFEBEE"/>
+    <path d="M36 64 Q50 58 64 64 Q58 72 50 74 Q42 72 36 64Z" fill="#EF9A9A"/>
+    <ellipse cx="50" cy="44" rx="26" ry="24" fill="#FFCDD2"/>
+    <path d="M24 44 Q24 20 50 18 Q76 20 76 44 Q76 32 50 28 Q24 32 24 44Z" fill="#C62828"/>
+    <ellipse cx="26" cy="36" rx="7" ry="8" fill="#C62828"/>
+    <ellipse cx="74" cy="36" rx="7" ry="8" fill="#C62828"/>
+    <ellipse cx="41" cy="44" rx="5" ry="5.5" fill="#1a1a1a"/>
+    <ellipse cx="59" cy="44" rx="5" ry="5.5" fill="#1a1a1a"/>
+    <ellipse cx="42.5" cy="42.5" rx="2" ry="2" fill="#fff"/>
+    <ellipse cx="60.5" cy="42.5" rx="2" ry="2" fill="#fff"/>
+    <path d="M36 40 Q41 37 46 39" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M54 39 Q59 37 64 40" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M42 56 Q50 52 58 56" stroke="#c0392b" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </svg>`;
+  return `<svg width="70" height="70"><use href="#ubao"/></svg>`;
+}
+
+function hitMole(hd,i,cx,cy){
+  hd.hit=true;hd.up=false;
+  if(hd.mole){hd.mole.classList.remove('popping');hd.mole.classList.add('smashed');}
+  combo++;if(combo>maxCombo)maxCombo=combo;
+  clearTimeout(comboTm);
+  comboTm=setTimeout(()=>{combo=0;},1500);
+  let pts=hd.type==='golden'?50:hd.type==='bad'||hd.type==='custom'?100:10;
+  const mult=combo>=5?3:combo>=3?2:1;
+  pts*=mult;score+=pts;hits++;
+  sfxHit(pts);if(mult>1)sfxCombo();
+  triggerHammer(cx,cy);
+  const col=hd.type==='golden'?'#FFD600':hd.type==='bad'||hd.type==='custom'?'#F44336':mult>1?'#FF6D00':'#FFD600';
+  showPts(cx,cy,mult>1?'+'+pts+' x'+mult+'!':'+'+pts,col);
+  if(combo>=3){
+    const ce=document.getElementById('comboEl');
+    ce.classList.remove('hidden');
+    ce.textContent=combo>=5?(LANG==='zh'?'🔥 狂热 x'+mult+'!':'🔥 FEVER x'+mult+'!'):(LANG==='zh'?'⚡ 连击 x'+mult+'!':'⚡ COMBO x'+mult+'!');
+    clearTimeout(ce._t);ce._t=setTimeout(()=>ce.classList.add('hidden'),1200);
+  }
+  const f=document.getElementById('flashEl');
+  f.style.background=hd.type==='golden'?'rgba(255,214,0,.12)':hd.type==='bad'?'rgba(244,67,54,.1)':'rgba(76,175,80,.08)';
+  f.classList.add('go');setTimeout(()=>f.classList.remove('go'),100);
+  updateHUD();
+  if((gameStartTotal+score)>=TARGET&&CU&&!CU.rm88)setTimeout(()=>{sfxUnlock();toast(t('t_rm88_unlock'));CU.rm88=true;},400);
+  setGuide(getGuide());
+  setTimeout(()=>{if(hd.mole?.parentNode)hd.mole.parentNode.removeChild(hd.mole);hd.mole=null;hd.hit=false;},380);
+}
+
+function hideMole(hd,i){
+  hd.up=false;if(!hd.mole)return;
+  hd.mole.classList.remove('popping');hd.mole.classList.add('hiding');
+  const m=hd.mole;
+  setTimeout(()=>{if(m.parentNode)m.parentNode.removeChild(m);hd.mole=null;},220);
+}
+
+function updateHUD(){
+  document.getElementById('hScore').textContent=score;
+  document.getElementById('hTime').textContent=timeLeft;
+  if(CU)document.getElementById('hBest').textContent=CU.best||0;
+}
+
+const GUIDE_KEYS=['g_smash','g_gold','g_combo','g_enemy','g_888','g_fever'];
+function getGuide(){
+  if(score>=8000)return t('g_almost');
+  if(combo>=5)return t('g_fever_now');
+  if(combo>=3)return t('g_combo_now',{n:combo});
+  guideIdx=(guideIdx+1)%GUIDE_KEYS.length;
+  return t(GUIDE_KEYS[guideIdx]);
+}
+function setGuide(txt){const el=document.getElementById('guideEl');if(el)el.textContent=txt;}
+
+// =================== HAMMER ===================
+function setupHammer(){
+  const h=document.getElementById('hmrEl');
+  h.textContent=WEAPONS[weapon];
+  const field=document.getElementById('fieldEl');
+  if(window.matchMedia('(hover:hover)').matches){
+    h.style.display='block';
+    field.onmousemove=e=>{h.style.left=e.clientX+'px';h.style.top=e.clientY+'px';};
+    field.style.cursor='none';
+  }
+}
+function triggerHammer(x,y){
+  const h=document.getElementById('hmrEl');
+  if(h.style.display==='block'){
+    h.classList.remove('swing');void h.offsetWidth;h.classList.add('swing');
+    setTimeout(()=>h.classList.remove('swing'),200);
+  }
+  if(navigator.vibrate)navigator.vibrate([30,10,20]);
+}
+
+// =================== FLOAT ===================
+function showPts(x,y,text,color){
+  const el=document.createElement('div');
+  el.className='fpts';el.textContent=text;
+  el.style.cssText=`left:${x}px;top:${y-20}px;color:${color};text-shadow:0 0 8px ${color}66`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),950);
+}
+
+// =================== END ===================
+function endGame(){
+  gActive=false;
+  clearInterval(gTimer);
+  moleTimers.forEach(clearTimeout);moleTimers=[];
+  document.getElementById('hTime').classList.remove('urgent');
+  document.getElementById('hmrEl').style.display='none';
+  document.getElementById('fieldEl').style.cursor='';
+  document.getElementById('fieldEl').onmousemove=null;
+  holeData.forEach((hd,i)=>{if(hd.up)hideMole(hd,i);});
+  sfxGameOver();
+
+  if(CU){
+    const was=!CU.rm88;
+    if(score>CU.best)CU.best=score;
+    CU.totalScore=(CU.totalScore||0)+score;
+    CU.games=(CU.games||0)+1;
+    if(CU.totalScore>=TARGET)CU.rm88=true;
+    const players=DB.players();players[CU.phone]=CU;DB.savePlayers(players);
+    DB.addGame({uid:CU.phone,name:CU.name,score,hits,combo:maxCombo,t:Date.now()});
+    if(CU.rm88&&was){setTimeout(()=>{sfxUnlock();toast(t('t_rm88_after'));},800);}
+  }
+  setTimeout(()=>{showScreen('resultsScreen');renderResults();},700);
+}
+
+function renderResults(){
+  const titles=['r_t0','r_t1','r_t2','r_t3','r_t4','r_t5'];
+  const tier=Math.min(5,Math.floor(score/1600));
+  document.getElementById('resTitle').textContent=t(titles[tier]);
+  document.getElementById('resScore').textContent=score.toLocaleString();
+  document.getElementById('resStats').innerHTML=
+    `<div class="rs-box"><div class="rs-v">${hits}</div><div class="rs-l">${t('res_hits')}</div></div>`+
+    `<div class="rs-box"><div class="rs-v">${maxCombo}</div><div class="rs-l">${t('res_combo')}</div></div>`+
+    `<div class="rs-box"><div class="rs-v">${totalSpawn?Math.round(hits/totalSpawn*100):0}%</div><div class="rs-l">${t('res_acc')}</div></div>`;
+
+  const re=document.getElementById('rewardEl');
+  if(CU?.rm88||(CU?.totalScore||0)>=TARGET){
+    re.classList.remove('hidden');re.className='reward-box rm88';
+    document.getElementById('rewardIcon').textContent='🎉';
+    document.getElementById('rewardTitle').textContent=t('r_rm88_title');
+    document.getElementById('rewardSub').textContent=t('r_rm88_sub');
+  } else if(score>0){
+    re.classList.remove('hidden');re.className='reward-box keep';
+    document.getElementById('rewardIcon').textContent='📊';
+    document.getElementById('rewardTitle').textContent=t('r_keep_title');
+    const need=Math.max(0,TARGET-(CU?.totalScore||0));
+    document.getElementById('rewardSub').textContent=t('r_keep_sub',{n:need.toLocaleString()});
+  } else {re.classList.add('hidden');}
+  document.getElementById('shareTextEl').textContent=t('res_share_text',{score:score.toLocaleString()});
+}
+
+function doShare(){
+  const text=t('share_msg',{score:score.toLocaleString(),combo:maxCombo,code:CU?.code||'????'});
+  if(navigator.share){navigator.share({text}).catch(()=>{});}
+  else navigator.clipboard.writeText(text).then(()=>toast(t('t_share_copied')));
+}
+
+// =================== LB ===================
+function showLB(){
+  showScreen('lbScreen');
+  const players=Object.values(DB.players()).sort((a,b)=>b.best-a.best).slice(0,20);
+  const list=document.getElementById('lbList');list.innerHTML='';
+  if(!players.length){list.innerHTML=`<p style="text-align:center;color:var(--muted);padding:40px">${t('lb_empty')}</p>`;return;}
+  const medals=['🥇','🥈','🥉'];
+  players.forEach((p,i)=>{
+    const row=document.createElement('div');row.className='lb-row';
+    const rankClr=i===0?'color:var(--gold)':i===1?'color:#90A4AE':i===2?'color:#A1887F':'color:var(--muted)';
+    row.innerHTML=`<div class="lb-rank" style="${rankClr}">${medals[i]||i+1}</div>
+      <div class="lb-av">🐸</div>
+      <div style="flex:1"><div class="lb-nm">${esc(p.name)}</div><div class="lb-ph">${mask(p.phone)}</div></div>
+      <div class="lb-sc">${(p.best||0).toLocaleString()}</div>`;
+    list.appendChild(row);
+  });
+}
+
+// =================== INVITE ===================
+function openInvite(){
+  if(!CU)return;
+  document.getElementById('myCode').textContent='UBAO-'+(CU.code||'????');
+  document.getElementById('invModal').classList.remove('hidden');
+}
+function copyCode(){
+  const c='UBAO-'+(CU?.code||'????');
+  const txt=t('invite_msg',{code:c});
+  navigator.clipboard.writeText(txt).then(()=>toast(t('t_copied')));
+  document.getElementById('invModal').classList.add('hidden');
+}
+
+// =================== ADMIN ===================
+function tryAdmin(){
+  const pw=prompt(t('t_admin_pw'));
+  if(pw==='admin888'){showScreen('adminScreen');adminTab('overview',document.querySelector('.tab'));}
+  else if(pw!==null)toast(t('t_wrong_pw'));
+}
+
+function adminTab(tab,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  const body=document.getElementById('adminBody');
+  const ps=Object.values(DB.players());
+  const gs=DB.games();
+  if(tab==='overview'){
+    const today=new Date().toDateString();
+    const dau=new Set(gs.filter(g=>new Date(g.t).toDateString()===today).map(g=>g.uid)).size;
+    const avg=gs.length?Math.round(gs.reduce((s,g)=>s+g.score,0)/gs.length):0;
+    body.innerHTML=`<div class="sg">
+      <div class="sc"><div class="sc-v">${ps.length}</div><div class="sc-l">${t('a_total')}</div></div>
+      <div class="sc"><div class="sc-v">${dau}</div><div class="sc-l">${t('a_dau')}</div></div>
+      <div class="sc"><div class="sc-v">${gs.length}</div><div class="sc-l">${t('a_games')}</div></div>
+      <div class="sc"><div class="sc-v">${avg.toLocaleString()}</div><div class="sc-l">${t('a_avg')}</div></div>
+      <div class="sc"><div class="sc-v">${ps.filter(p=>p.rm88).length}</div><div class="sc-l">${t('a_rm88')}</div></div>
+      <div class="sc"><div class="sc-v">${ps.reduce((s,p)=>s+(p.refs||0),0)}</div><div class="sc-l">${t('a_refs')}</div></div>
+      </div>
+      <div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:8px">${t('a_top10')}</div>
+      <div class="tw"><table class="dt">
+        <thead><tr><th>#</th><th>${t('a_th_name')}</th><th>${t('a_th_best')}</th><th>${t('a_th_games')}</th><th>RM88</th></tr></thead>
+        <tbody>${ps.sort((a,b)=>b.best-a.best).slice(0,10).map((p,i)=>`<tr>
+          <td>${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td>
+          <td>${esc(p.name)}</td>
+          <td style="color:var(--gold);font-weight:700">${(p.best||0).toLocaleString()}</td>
+          <td>${p.games||0}</td>
+          <td>${p.rm88?'<span class="badge by">RM88 ✓</span>':'<span class="badge bb">–</span>'}</td>
+        </tr>`).join('')}</tbody></table></div>`;
+  } else if(tab==='players'){
+    body.innerHTML=`<input class="srch" id="srchInput" placeholder="${t('a_search')}" oninput="filterP()">
+      <div id="ptable">${pTable(ps)}</div>`;
+  } else if(tab==='leaderboard'){
+    const sorted=[...ps].sort((a,b)=>b.best-a.best);
+    body.innerHTML=`<div class="tw"><table class="dt">
+      <thead><tr><th>${t('a_th_rank')}</th><th>${t('a_th_name')}</th><th>${t('a_th_phone')}</th><th>${t('a_th_high')}</th><th>${t('a_th_total')}</th><th>${t('a_th_refs')}</th><th>${t('a_th_joined')}</th></tr></thead>
+      <tbody>${sorted.map((p,i)=>`<tr>
+        <td>${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td>
+        <td><strong>${esc(p.name)}</strong></td>
+        <td>${mask(p.phone)}</td>
+        <td style="color:var(--gold);font-weight:700">${(p.best||0).toLocaleString()}</td>
+        <td>${(p.totalScore||0).toLocaleString()}</td>
+        <td>${p.refs||0}</td>
+        <td>${new Date(p.joined||0).toLocaleDateString()}</td>
+      </tr>`).join('')}</tbody></table></div>`;
+  } else if(tab==='rewards'){
+    const r88=ps.filter(p=>p.rm88);
+    const rRef=ps.filter(p=>(p.refs||0)>0);
+    const totalPayout=r88.length*88+rRef.reduce((s,p)=>s+Math.min((p.refs||0)*8,88),0);
+    body.innerHTML=`<div class="sg">
+      <div class="sc"><div class="sc-v">${r88.length}</div><div class="sc-l">${t('a_rm88_unlock')}</div></div>
+      <div class="sc"><div class="sc-v">${rRef.length}</div><div class="sc-l">${t('a_active_ref')}</div></div>
+      <div class="sc"><div class="sc-v">RM${totalPayout}</div><div class="sc-l">${t('a_payout')}</div></div>
+      </div>
+      <div class="tw"><table class="dt">
+        <thead><tr><th>${t('a_th_name')}</th><th>${t('a_th_phone')}</th><th>${t('a_th_best')}</th><th>RM88</th><th>${t('a_th_refs')}</th><th>${t('a_th_rmbonus')}</th><th>${t('a_th_rewards_total')}</th></tr></thead>
+        <tbody>${ps.filter(p=>p.rm88||(p.refs||0)>0).sort((a,b)=>b.best-a.best).map(p=>{
+          const tot=Math.min((p.rm88?88:0)+(p.refRew||0),88);
+          return `<tr>
+            <td>${esc(p.name)}</td><td>${mask(p.phone)}</td>
+            <td>${(p.best||0).toLocaleString()}</td>
+            <td>${p.rm88?'<span class="badge by">RM88 ✓</span>':'–'}</td>
+            <td>${p.refs||0}</td>
+            <td>${(p.refRew||0)>0?'<span class="badge bg-">RM'+p.refRew+'</span>':'–'}</td>
+            <td><strong>RM${tot}</strong></td>
+          </tr>`;}).join('')||`<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">${t('a_norewards')}</td></tr>`}
+        </tbody></table></div>`;
+  }
+}
+
+function pTable(ps){
+  if(!ps.length)return `<p style="text-align:center;color:var(--muted);padding:20px">${t('a_no_players')}</p>`;
+  return `<div class="tw"><table class="dt">
+    <thead><tr><th>${t('a_th_name')}</th><th>${t('a_th_phone')}</th><th>${t('a_th_best')}</th><th>${t('a_th_total')}</th><th>${t('a_th_games')}</th><th>${t('a_th_refs')}</th><th>${t('a_th_status')}</th></tr></thead>
+    <tbody>${[...ps].sort((a,b)=>b.best-a.best).map(p=>`<tr>
+      <td><strong>${esc(p.name)}</strong></td>
+      <td>${mask(p.phone)}</td>
+      <td style="color:var(--gold)">${(p.best||0).toLocaleString()}</td>
+      <td>${(p.totalScore||0).toLocaleString()}</td>
+      <td>${p.games||0}</td>
+      <td>${p.refs||0}</td>
+      <td>${p.rm88?'<span class="badge by">RM88</span>':`<span class="badge bb">${t('a_active')}</span>`}</td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+
+function filterP(){
+  const q=(document.getElementById('srchInput')?.value||'').toLowerCase();
+  const ps=Object.values(DB.players()).filter(p=>p.name.toLowerCase().includes(q)||p.phone.includes(q));
+  const tbl=document.getElementById('ptable');
+  if(tbl)tbl.innerHTML=pTable(ps);
+}
+
+// =================== UTILS ===================
+function toast(msg){
+  const t=document.getElementById('toastEl');
+  t.textContent=msg;t.classList.add('on');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),3000);
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function mask(p){const s=String(p);return s.length<=4?s:s.slice(0,3)+'****'+s.slice(-2);}
+
+// =================== INIT ===================
+window.addEventListener('load',()=>{
+  // Restore language
+  try{
+    const savedLang = localStorage.getItem('sf_lang');
+    if(savedLang === 'en' || savedLang === 'zh') LANG = savedLang;
+  }catch{}
+  setLang(LANG);
+  // Restore session
+  const sess=DB.get('sess');
+  if(sess){const players=DB.players();if(players[sess]){CU=players[sess];showScreen('menuScreen');updateMenuUI();return;}}
+  showScreen('loginScreen');
+});
+
+// Prevent double-tap zoom
+let lt=0;
+document.addEventListener('touchend',e=>{const n=Date.now();if(n-lt<280)e.preventDefault();lt=n;},{passive:false});
+document.addEventListener('pointerdown',()=>{getAC();},{once:true});
+</script>
+</body>
+</html>
