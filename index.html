@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Smash Fever — U宝 Edition</title>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+SC:wght@500;700;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -227,7 +230,13 @@ body.lang-zh{font-family:'Noto Sans SC','Nunito',sans-serif}
 .btn-copy:active{transform:scale(.97)}
 .btn-close{width:100%;margin-top:10px;padding:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--muted);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer}
 
-/* TOAST */
+/* LOADING OVERLAY */
+.loading-ov{position:fixed;inset:0;background:rgba(10,22,40,.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.loading-ov.hidden{display:none!important}
+.spin{width:50px;height:50px;border:4px solid rgba(76,175,80,.2);border-top-color:var(--green2);border-radius:50%;animation:spinning 1s linear infinite}
+@keyframes spinning{to{transform:rotate(360deg)}}
+.loading-txt{font-size:15px;color:var(--muted);font-weight:700}
+.firebase-err{background:rgba(244,67,54,.1);border:1px solid rgba(244,67,54,.3);border-radius:12px;padding:14px 18px;max-width:380px;width:100%;font-size:14px;color:#EF9A9A;text-align:center;margin-top:10px;display:none}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(15,30,55,.95);border:1px solid rgba(76,175,80,.35);border-radius:14px;padding:11px 20px;font-size:15px;font-weight:700;color:#fff;z-index:1000;opacity:0;transition:all .28s;pointer-events:none;max-width:92vw;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -261,6 +270,11 @@ body.lang-zh{font-family:'Noto Sans SC','Nunito',sans-serif}
 <div class="lang-toggle" id="langToggle">
   <button id="btnEN" onclick="setLang('en')">EN</button>
   <button id="btnZH" onclick="setLang('zh')" class="on">中文</button>
+</div>
+
+<div class="loading-ov hidden" id="loadingOv">
+  <div class="spin"></div>
+  <div class="loading-txt" id="loadingTxt">Loading...</div>
 </div>
 
 <div class="stars" id="starsEl"></div>
@@ -318,6 +332,7 @@ body.lang-zh{font-family:'Noto Sans SC','Nunito',sans-serif}
     <input class="form-input" id="iRef" data-i18n-ph="login_ref_ph" style="margin:0">
   </div>
   <button class="btn-play" onclick="doLogin()" data-i18n="login_play">🎮 Let's Play!</button>
+  <div class="firebase-err" id="firebaseErr">⚠️ Firebase not configured yet.<br>Please paste your Firebase config in the code.</div>
   <div class="switch-link" style="margin-top:12px"><span data-i18n="login_haveref">Have a referral code?</span> <span onclick="toggleRef()" data-i18n="login_clickenter">Enter it here</span></div>
 </div>
 </div>
@@ -830,14 +845,101 @@ function sfxGameOver(){[523,440,349,261].forEach((f,i)=>playTone(f,'sine',.25,.3
 function sfxUnlock(){[523,659,784,1047,1319].forEach((f,i)=>playTone(f,'sine',.2,.3,i*.1));}
 function sfxBonus(){[440,554,659,880].forEach((f,i)=>playTone(f,'sine',.15,.25,i*.08));}
 
+// ============================================================
+// 🔥 FIREBASE CONFIG
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyCWTJEdiTI2Zy_bKwortLrilnfoh2LxIz0",
+  authDomain: "smash-fever.firebaseapp.com",
+  projectId: "smash-fever",
+  storageBucket: "smash-fever.firebasestorage.app",
+  messagingSenderId: "153274809363",
+  appId: "1:153274809363:web:768414dc118f03e27353e6"
+};
+// ============================================================
+
+let db = null;
+let fbReady = false;
+
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  // Quick check if config is valid (not placeholder)
+  if(firebaseConfig.apiKey.includes('PASTE')){
+    fbReady = false;
+    console.warn('Firebase config not set yet!');
+  } else {
+    fbReady = true;
+  }
+} catch(e) {
+  console.error('Firebase init error:', e);
+}
+
 // =================== DB ===================
-const DB={
+const DB = {
+  // Session stays in localStorage (fast, device-local)
   get(k){try{return JSON.parse(localStorage.getItem('sf_'+k))}catch{return null}},
   set(k,v){try{localStorage.setItem('sf_'+k,JSON.stringify(v))}catch{}},
-  players(){return this.get('players')||{}},
-  savePlayers(p){this.set('players',p)},
-  games(){return this.get('games')||[]},
-  addGame(g){const gs=this.games();gs.push(g);if(gs.length>500)gs.shift();this.set('games',gs)},
+
+  // ---- Players (Firestore) ----
+  async getPlayer(phone){
+    if(!fbReady) return this.get('players_'+phone);
+    try{
+      const doc = await db.collection('players').doc(String(phone)).get();
+      return doc.exists ? doc.data() : null;
+    }catch(e){console.error(e);return null;}
+  },
+  async savePlayer(player){
+    if(!fbReady){this.set('players_'+player.phone, player);return;}
+    try{
+      await db.collection('players').doc(String(player.phone)).set(player, {merge:true});
+      // Also update local CU cache
+    }catch(e){console.error(e);}
+  },
+  async getAllPlayers(){
+    if(!fbReady) return [];
+    try{
+      const snap = await db.collection('players').get();
+      return snap.docs.map(d=>d.data());
+    }catch(e){console.error(e);return [];}
+  },
+  async getLeaderboard(lim=20){
+    if(!fbReady) return [];
+    try{
+      const snap = await db.collection('players').orderBy('best','desc').limit(lim).get();
+      return snap.docs.map(d=>d.data());
+    }catch(e){console.error(e);return [];}
+  },
+
+  // ---- Games (Firestore) ----
+  async addGame(game){
+    if(!fbReady) return;
+    try{await db.collection('games').add(game);}catch(e){console.error(e);}
+  },
+  async getGames(lim=300){
+    if(!fbReady) return [];
+    try{
+      const snap = await db.collection('games').orderBy('t','desc').limit(lim).get();
+      return snap.docs.map(d=>d.data());
+    }catch(e){console.error(e);return [];}
+  },
+  async getDailyGames(){
+    if(!fbReady) return [];
+    try{
+      const midnight=new Date();midnight.setHours(0,0,0,0);
+      const snap = await db.collection('games').where('t','>=',midnight.getTime()).get();
+      return snap.docs.map(d=>d.data());
+    }catch(e){return [];}
+  },
+
+  // ---- Referral lookup ----
+  async findByCode(code){
+    if(!fbReady) return null;
+    try{
+      const snap = await db.collection('players').where('code','==',code).limit(1).get();
+      return snap.empty ? null : snap.docs[0].data();
+    }catch(e){return null;}
+  }
 };
 
 // =================== STATE ===================
@@ -867,42 +969,64 @@ function showScreen(id){
   document.getElementById('langToggle').classList.toggle('in-game', id==='gameScreen');
 }
 
+// =================== LOADING ===================
+function showLoading(show, msg=''){
+  const ov=document.getElementById('loadingOv');
+  if(msg) document.getElementById('loadingTxt').textContent=msg;
+  ov.classList.toggle('hidden',!show);
+}
+
 // =================== LOGIN ===================
 let refShown=false;
 function toggleRef(){refShown=!refShown;document.getElementById('refBox').style.display=refShown?'block':'none';}
 
-function doLogin(){
+async function doLogin(){
   const name=document.getElementById('iName').value.trim();
   const phone=document.getElementById('iPhone').value.trim().replace(/\D/g,'');
   if(!name){toast(t('t_no_name'));return;}
   if(phone.length<8){toast(t('t_bad_phone'));return;}
 
-  const players=DB.players();
-  if(!players[phone]){
-    const ref=(document.getElementById('iRef').value||'').trim().toUpperCase().replace('UBAO-','');
-    if(ref){
-      const refP=Object.values(players).find(p=>p.code===ref);
-      if(refP){
-        refP.refs=(refP.refs||0)+1;
-        refP.refRew=Math.min((refP.refs*8),88); // RM8 per referral, max RM88
-        players[refP.phone]=refP;
-      }
-    }
-    players[phone]={
-      id:phone,name,phone,totalScore:0,best:0,games:0,
-      refs:0,refRew:0,rm88:false,refBy:ref||null,
-      code:mkCode(name),joined:Date.now(),lastLogin:Date.now(),lastBonus:0
-    };
-    toast(t('t_welcome_new',{name}));
-  } else {
-    players[phone].lastLogin=Date.now();
-    toast(t('t_welcome_back',{name:players[phone].name}));
+  if(!fbReady){
+    document.getElementById('firebaseErr').style.display='block';
+    toast(LANG==='zh'?'⚠️ 请先配置 Firebase！':'⚠️ Please configure Firebase first!');
+    return;
   }
-  DB.savePlayers(players);
-  DB.set('sess',phone);
-  CU=players[phone];
-  showScreen('menuScreen');
-  updateMenuUI();
+
+  showLoading(true, LANG==='zh'?'连接中... 🔥':'Connecting... 🔥');
+  try{
+    let player = await DB.getPlayer(phone);
+    if(!player){
+      const ref=(document.getElementById('iRef').value||'').trim().toUpperCase().replace('UBAO-','');
+      if(ref){
+        const refP = await DB.findByCode(ref);
+        if(refP){
+          refP.refs=(refP.refs||0)+1;
+          refP.refRew=Math.min(refP.refs*8, 88);
+          await DB.savePlayer(refP);
+        }
+      }
+      player={
+        id:phone, name, phone, totalScore:0, best:0, games:0,
+        refs:0, refRew:0, rm88:false, refBy:ref||null,
+        code:mkCode(name), joined:Date.now(), lastLogin:Date.now(), lastBonus:0
+      };
+      await DB.savePlayer(player);
+      toast(t('t_welcome_new',{name}));
+    } else {
+      player.lastLogin=Date.now();
+      await DB.savePlayer(player);
+      toast(t('t_welcome_back',{name:player.name}));
+    }
+    DB.set('sess', phone);
+    CU=player;
+    showScreen('menuScreen');
+    updateMenuUI();
+  }catch(e){
+    console.error('Login error:',e);
+    toast(LANG==='zh'?'⚠️ 连接失败，请检查网络':'⚠️ Connection error, please retry');
+  }finally{
+    showLoading(false);
+  }
 }
 
 function mkCode(name){
@@ -954,14 +1078,14 @@ function mascotTalk(){
   toast(msgs[Math.floor(Math.random()*msgs.length)]);
 }
 
-function claimBonus(){
+async function claimBonus(){
   if(!CU)return;
   const today=new Date().toDateString();
   if(new Date(CU.lastBonus||0).toDateString()===today){toast(t('t_already_bonus'));return;}
   const bonus=50+Math.floor(Math.random()*51);
   CU.totalScore=(CU.totalScore||0)+bonus;
   CU.lastBonus=Date.now();
-  const players=DB.players();players[CU.phone]=CU;DB.savePlayers(players);
+  await DB.savePlayer(CU);
   sfxBonus();
   toast(t('t_bonus_got',{n:bonus}));
   updateMenuUI();
@@ -1228,8 +1352,9 @@ function endGame(){
     CU.totalScore=(CU.totalScore||0)+score;
     CU.games=(CU.games||0)+1;
     if(CU.totalScore>=TARGET)CU.rm88=true;
-    const players=DB.players();players[CU.phone]=CU;DB.savePlayers(players);
-    DB.addGame({uid:CU.phone,name:CU.name,score,hits,combo:maxCombo,t:Date.now()});
+    // Save to Firebase (async, non-blocking — show results immediately)
+    DB.savePlayer(CU).catch(e=>console.error('Save player error:',e));
+    DB.addGame({uid:CU.phone,name:CU.name,score,hits,combo:maxCombo,t:Date.now()}).catch(e=>console.error('Add game error:',e));
     if(CU.rm88&&was){setTimeout(()=>{sfxUnlock();toast(t('t_rm88_after'));},800);}
   }
   setTimeout(()=>{showScreen('resultsScreen');renderResults();},700);
@@ -1268,10 +1393,12 @@ function doShare(){
 }
 
 // =================== LB ===================
-function showLB(){
+async function showLB(){
   showScreen('lbScreen');
-  const players=Object.values(DB.players()).sort((a,b)=>b.best-a.best).slice(0,20);
-  const list=document.getElementById('lbList');list.innerHTML='';
+  const list=document.getElementById('lbList');
+  list.innerHTML=`<div style="text-align:center;padding:40px"><div class="spin" style="margin:0 auto 12px"></div><div style="color:var(--muted);font-size:14px">${LANG==='zh'?'加载中...':'Loading...'}</div></div>`;
+  const players = await DB.getLeaderboard(20);
+  list.innerHTML='';
   if(!players.length){list.innerHTML=`<p style="text-align:center;color:var(--muted);padding:40px">${t('lb_empty')}</p>`;return;}
   const medals=['🥇','🥈','🥉'];
   players.forEach((p,i)=>{
@@ -1305,12 +1432,16 @@ function tryAdmin(){
   else if(pw!==null)toast(t('t_wrong_pw'));
 }
 
-function adminTab(tab,el){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+const spinnerRow=`<div style="text-align:center;padding:40px"><div class="spin" style="margin:0 auto 12px"></div><div style="color:var(--muted);font-size:13px">${'Loading...'}</div></div>`;
+
+async function adminTab(tab,el){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
   el.classList.add('on');
   const body=document.getElementById('adminBody');
-  const ps=Object.values(DB.players());
-  const gs=DB.games();
+  body.innerHTML=spinnerRow;
+
+  const [ps,gs] = await Promise.all([DB.getAllPlayers(), DB.getGames()]);
+
   if(tab==='overview'){
     const today=new Date().toDateString();
     const dau=new Set(gs.filter(g=>new Date(g.t).toDateString()===today).map(g=>g.uid)).size;
@@ -1326,7 +1457,7 @@ function adminTab(tab,el){
       <div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:8px">${t('a_top10')}</div>
       <div class="tw"><table class="dt">
         <thead><tr><th>#</th><th>${t('a_th_name')}</th><th>${t('a_th_best')}</th><th>${t('a_th_games')}</th><th>RM88</th></tr></thead>
-        <tbody>${ps.sort((a,b)=>b.best-a.best).slice(0,10).map((p,i)=>`<tr>
+        <tbody>${[...ps].sort((a,b)=>b.best-a.best).slice(0,10).map((p,i)=>`<tr>
           <td>${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td>
           <td>${esc(p.name)}</td>
           <td style="color:var(--gold);font-weight:700">${(p.best||0).toLocaleString()}</td>
@@ -1334,7 +1465,7 @@ function adminTab(tab,el){
           <td>${p.rm88?'<span class="badge by">RM88 ✓</span>':'<span class="badge bb">–</span>'}</td>
         </tr>`).join('')}</tbody></table></div>`;
   } else if(tab==='players'){
-    body.innerHTML=`<input class="srch" id="srchInput" placeholder="${t('a_search')}" oninput="filterP()">
+    body.innerHTML=`<input class="srch" id="srchInput" placeholder="${t('a_search')}" oninput="filterP(this.value)">
       <div id="ptable">${pTable(ps)}</div>`;
   } else if(tab==='leaderboard'){
     const sorted=[...ps].sort((a,b)=>b.best-a.best);
@@ -1389,9 +1520,9 @@ function pTable(ps){
     </tr>`).join('')}</tbody></table></div>`;
 }
 
-function filterP(){
-  const q=(document.getElementById('srchInput')?.value||'').toLowerCase();
-  const ps=Object.values(DB.players()).filter(p=>p.name.toLowerCase().includes(q)||p.phone.includes(q));
+async function filterP(q){
+  if(!q){q='';}
+  const ps=(await DB.getAllPlayers()).filter(p=>p.name.toLowerCase().includes(q.toLowerCase())||p.phone.includes(q));
   const tbl=document.getElementById('ptable');
   if(tbl)tbl.innerHTML=pTable(ps);
 }
@@ -1406,16 +1537,34 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 function mask(p){const s=String(p);return s.length<=4?s:s.slice(0,3)+'****'+s.slice(-2);}
 
 // =================== INIT ===================
-window.addEventListener('load',()=>{
+window.addEventListener('load',async()=>{
   // Restore language
-  try{
-    const savedLang = localStorage.getItem('sf_lang');
-    if(savedLang === 'en' || savedLang === 'zh') LANG = savedLang;
-  }catch{}
+  try{const savedLang=localStorage.getItem('sf_lang');if(savedLang==='en'||savedLang==='zh')LANG=savedLang;}catch{}
   setLang(LANG);
-  // Restore session
+
+  // Check Firebase config placeholder
+  if(!fbReady){
+    document.getElementById('firebaseErr').style.display='block';
+    showScreen('loginScreen');
+    return;
+  }
+
+  // Restore session from Firestore
   const sess=DB.get('sess');
-  if(sess){const players=DB.players();if(players[sess]){CU=players[sess];showScreen('menuScreen');updateMenuUI();return;}}
+  if(sess){
+    showLoading(true, LANG==='zh'?'读取数据...':'Loading your data...');
+    try{
+      const player = await DB.getPlayer(sess);
+      if(player){
+        CU=player;
+        showLoading(false);
+        showScreen('menuScreen');
+        updateMenuUI();
+        return;
+      }
+    }catch(e){console.error(e);}
+    showLoading(false);
+  }
   showScreen('loginScreen');
 });
 
