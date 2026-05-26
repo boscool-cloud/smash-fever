@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#0a1628"/>
+  <radialGradient id="bg" cx="50%" cy="35%" r="60%">
+    <stop offset="0%" stop-color="#0d2a1a"/>
+    <stop offset="100%" stop-color="#0a1628"/>
+  </radialGradient>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- Glow -->
+  <ellipse cx="256" cy="220" rx="170" ry="160" fill="rgba(76,175,80,0.08)"/>
+  <!-- Body -->
+  <ellipse cx="256" cy="385" rx="118" ry="98" fill="#e8f5e9"/>
+  <ellipse cx="256" cy="398" rx="108" ry="84" fill="#4CAF50"/>
+  <ellipse cx="256" cy="404" rx="66" ry="58" fill="#e8f5e9"/>
+  <!-- Bib -->
+  <path d="M196 334 Q256 314 316 334 Q296 362 256 370 Q216 362 196 334Z" fill="#81C784"/>
+  <!-- Head -->
+  <ellipse cx="256" cy="214" rx="108" ry="100" fill="#FFCCBC"/>
+  <!-- Hood -->
+  <path d="M148 214 Q148 112 256 102 Q364 112 364 214 Q364 152 256 132 Q148 152 148 214Z" fill="#43A047"/>
+  <!-- Ears -->
+  <ellipse cx="150" cy="170" rx="30" ry="34" fill="#43A047"/>
+  <ellipse cx="362" cy="170" rx="30" ry="34" fill="#43A047"/>
+  <ellipse cx="150" cy="170" rx="18" ry="22" fill="#66BB6A"/>
+  <ellipse cx="362" cy="170" rx="18" ry="22" fill="#66BB6A"/>
+  <!-- Cheeks -->
+  <ellipse cx="188" cy="236" rx="30" ry="22" fill="#FFAB91" opacity=".65"/>
+  <ellipse cx="324" cy="236" rx="30" ry="22" fill="#FFAB91" opacity=".65"/>
+  <!-- Eyes -->
+  <ellipse cx="218" cy="208" rx="22" ry="24" fill="#111"/>
+  <ellipse cx="294" cy="208" rx="22" ry="24" fill="#111"/>
+  <ellipse cx="225" cy="201" rx="8" ry="8" fill="#fff"/>
+  <ellipse cx="301" cy="201" rx="8" ry="8" fill="#fff"/>
+  <!-- Brows -->
+  <path d="M198 190 Q218 180 238 190" stroke="#333" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M274 190 Q294 180 314 190" stroke="#333" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Smile -->
+  <path d="M216 256 Q256 280 296 256" stroke="#b03020" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Arms raised -->
+  <ellipse cx="136" cy="320" rx="32" ry="42" fill="#e8f5e9" transform="rotate(-30 136 320)"/>
+  <ellipse cx="376" cy="320" rx="32" ry="42" fill="#e8f5e9" transform="rotate(30 376 320)"/>
+  <!-- Bottom label -->
+  <rect x="96" y="454" width="320" height="46" rx="23" fill="#4CAF50" opacity=".9"/>
+  <text x="256" y="486" text-anchor="middle" font-family="Arial,sans-serif" font-size="26" font-weight="900" fill="#fff" letter-spacing="1">SMASH FEVER</text>
+</svg>

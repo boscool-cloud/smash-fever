@@ -4,6 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Smash Fever — U宝 Edition</title>
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Theme & Status Bar -->
+<meta name="theme-color" content="#4CAF50">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- iOS / Apple PWA Support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Smash Fever">
+<link rel="apple-touch-icon" href="icon.svg">
+
+<!-- SEO / Share preview -->
+<meta name="description" content="打地鼠游戏 · 累积 88,888 分赢取 RM88！Hit & Win!">
+<meta property="og:title" content="Smash Fever — U宝 Edition">
+<meta property="og:description" content="打地鼠游戏 · 累积 88,888 分赢取 RM88！">
+<meta property="og:image" content="icon.svg">
+
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -237,6 +257,16 @@ body.lang-zh{font-family:'Noto Sans SC','Nunito',sans-serif}
 @keyframes spinning{to{transform:rotate(360deg)}}
 .loading-txt{font-size:15px;color:var(--muted);font-weight:700}
 .firebase-err{background:rgba(244,67,54,.1);border:1px solid rgba(244,67,54,.3);border-radius:12px;padding:14px 18px;max-width:380px;width:100%;font-size:14px;color:#EF9A9A;text-align:center;margin-top:10px;display:none}
+/* PWA INSTALL BANNER */
+.install-banner{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#0d2a1a,#111f38);border-top:1px solid rgba(76,175,80,.3);padding:14px 20px;display:flex;align-items:center;gap:12px;z-index:800;transform:translateY(110%);transition:transform .4s cubic-bezier(.175,.885,.32,1.275)}
+.install-banner.show{transform:translateY(0)}
+.install-icon{width:46px;height:46px;border-radius:10px;flex-shrink:0;overflow:hidden;background:#0a1628;border:1px solid rgba(76,175,80,.3)}
+.install-icon img,.install-icon svg{width:100%;height:100%}
+.install-text{flex:1}
+.install-title{font-weight:800;font-size:14px;color:#fff}
+.install-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.install-btn{background:linear-gradient(135deg,#43A047,#00897B);border:none;border-radius:10px;padding:9px 14px;color:#fff;font-weight:800;font-size:13px;font-family:inherit;cursor:pointer;white-space:nowrap;box-shadow:0 3px 10px rgba(76,175,80,.4)}
+.install-dismiss{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:4px 6px;line-height:1;flex-shrink:0}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(15,30,55,.95);border:1px solid rgba(76,175,80,.35);border-radius:14px;padding:11px 20px;font-size:15px;font-weight:700;color:#fff;z-index:1000;opacity:0;transition:all .28s;pointer-events:none;max-width:92vw;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -281,6 +311,36 @@ body.lang-zh{font-family:'Noto Sans SC','Nunito',sans-serif}
 <div class="hmr" id="hmrEl"></div>
 <div class="hit-flash" id="flashEl"></div>
 <div class="toast" id="toastEl"></div>
+
+<!-- PWA Install Banner -->
+<div class="install-banner" id="installBanner">
+  <div class="install-icon">
+    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <rect width="512" height="512" rx="96" fill="#0a1628"/>
+      <ellipse cx="256" cy="385" rx="118" ry="98" fill="#e8f5e9"/>
+      <ellipse cx="256" cy="398" rx="108" ry="84" fill="#4CAF50"/>
+      <ellipse cx="256" cy="404" rx="66" ry="58" fill="#e8f5e9"/>
+      <path d="M196 334 Q256 314 316 334 Q296 362 256 370 Q216 362 196 334Z" fill="#81C784"/>
+      <ellipse cx="256" cy="214" rx="108" ry="100" fill="#FFCCBC"/>
+      <path d="M148 214 Q148 112 256 102 Q364 112 364 214 Q364 152 256 132 Q148 152 148 214Z" fill="#43A047"/>
+      <ellipse cx="150" cy="170" rx="30" ry="34" fill="#43A047"/>
+      <ellipse cx="362" cy="170" rx="30" ry="34" fill="#43A047"/>
+      <ellipse cx="150" cy="170" rx="18" ry="22" fill="#66BB6A"/>
+      <ellipse cx="362" cy="170" rx="18" ry="22" fill="#66BB6A"/>
+      <ellipse cx="218" cy="208" rx="22" ry="24" fill="#111"/>
+      <ellipse cx="294" cy="208" rx="22" ry="24" fill="#111"/>
+      <ellipse cx="225" cy="201" rx="8" ry="8" fill="#fff"/>
+      <ellipse cx="301" cy="201" rx="8" ry="8" fill="#fff"/>
+      <path d="M216 256 Q256 280 296 256" stroke="#b03020" stroke-width="8" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="install-text">
+    <div class="install-title" id="installTitle">📲 Install Smash Fever!</div>
+    <div class="install-sub" id="installSub">Play like an App · No App Store needed</div>
+  </div>
+  <button class="install-btn" id="installBtn" onclick="triggerInstall()">Install</button>
+  <button class="install-dismiss" onclick="dismissInstall()">×</button>
+</div>
 
 <!-- ===== UBAO SVG TEMPLATE (reused) ===== -->
 <svg style="display:none">
@@ -1572,6 +1632,89 @@ window.addEventListener('load',async()=>{
 let lt=0;
 document.addEventListener('touchend',e=>{const n=Date.now();if(n-lt<280)e.preventDefault();lt=n;},{passive:false});
 document.addEventListener('pointerdown',()=>{getAC();},{once:true});
+
+// =================== PWA ===================
+let deferredPrompt = null;
+
+// Register Service Worker
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
+      .catch(err => console.log('[PWA] SW registration failed:', err));
+  });
+}
+
+// Catch install prompt (Android Chrome)
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show install banner after 3 seconds on menu screen
+  setTimeout(() => {
+    if(document.getElementById('menuScreen') && !document.getElementById('menuScreen').classList.contains('hidden')){
+      showInstallBanner();
+    }
+  }, 3000);
+});
+
+// Also show banner when user reaches menu
+function maybeShowInstallBanner(){
+  if(deferredPrompt && !localStorage.getItem('pwa_dismissed')){
+    setTimeout(showInstallBanner, 2500);
+  }
+}
+
+function showInstallBanner(){
+  if(localStorage.getItem('pwa_dismissed')) return;
+  const banner = document.getElementById('installBanner');
+  const title = document.getElementById('installTitle');
+  const sub = document.getElementById('installSub');
+  const btn = document.getElementById('installBtn');
+  // Update text based on language
+  if(LANG === 'zh'){
+    title.textContent = '📲 安装 Smash Fever！';
+    sub.textContent = '像 App 一样游玩 · 无需应用商店';
+    btn.textContent = '立即安装';
+  } else {
+    title.textContent = '📲 Install Smash Fever!';
+    sub.textContent = 'Play like an App · No App Store needed';
+    btn.textContent = 'Install';
+  }
+  banner.classList.add('show');
+}
+
+function triggerInstall(){
+  const banner = document.getElementById('installBanner');
+  banner.classList.remove('show');
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(result => {
+      if(result.outcome === 'accepted'){
+        toast(LANG==='zh' ? '🎉 安装成功！在主屏幕找到游戏！' : '🎉 Installed! Find it on your home screen!');
+        localStorage.setItem('pwa_installed','1');
+      }
+      deferredPrompt = null;
+    });
+  }
+}
+
+function dismissInstall(){
+  document.getElementById('installBanner').classList.remove('show');
+  localStorage.setItem('pwa_dismissed','1');
+}
+
+// Show banner when app installed
+window.addEventListener('appinstalled', () => {
+  toast(LANG==='zh' ? '🎉 U宝已安装到主屏幕！' : '🎉 Smash Fever installed to home screen!');
+  deferredPrompt = null;
+});
+
+// Hook into showScreen to trigger install banner on menu
+const _origShowScreen = showScreen;
+window.showScreen = function(id){
+  _origShowScreen(id);
+  if(id === 'menuScreen') maybeShowInstallBanner();
+};
 </script>
 </body>
 </html>

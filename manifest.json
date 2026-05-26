@@ -1,0 +1,36 @@
+{
+  "name": "Smash Fever — U宝 Edition",
+  "short_name": "Smash Fever",
+  "description": "打地鼠游戏 · 累积 88,888 分赢取 RM88！Hit & Win!",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a1628",
+  "theme_color": "#4CAF50",
+  "lang": "zh-MY",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Play Now",
+      "short_name": "Play",
+      "description": "Start smashing immediately",
+      "url": "./"
+    }
+  ]
+}
