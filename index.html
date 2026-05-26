@@ -461,9 +461,10 @@ body.lang-zh{font-family:'Noto Sans SC','Nunito',sans-serif}
     </div>
   </div>
 
-  <div style="margin-top:14px;position:relative;z-index:1;display:flex;gap:10px">
+  <div style="margin-top:14px;position:relative;z-index:1;display:flex;gap:10px;max-width:380px;width:100%;flex-wrap:wrap">
     <button class="bk" onclick="tryAdmin()" data-i18n="menu_admin">🔐 Admin Panel</button>
     <button class="bk" onclick="doLogout()" style="color:#EF9A9A" data-i18n="menu_logout">↩ Logout</button>
+    <button class="bk" id="pwaBtn" onclick="handlePWAInstall()" style="color:var(--green2);border-color:rgba(76,175,80,.3);display:none">📲 <span id="pwaBtnText">Install App</span></button>
   </div>
   <div style="height:75px"></div>
 </div>
@@ -1640,8 +1641,8 @@ let deferredPrompt = null;
 if('serviceWorker' in navigator){
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
-      .catch(err => console.log('[PWA] SW registration failed:', err));
+      .then(reg => console.log('[PWA] SW registered:', reg.scope))
+      .catch(err => console.log('[PWA] SW failed:', err));
   });
 }
 
@@ -1649,18 +1650,56 @@ if('serviceWorker' in navigator){
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
-  // Show install banner after 3 seconds on menu screen
+  showPWAButton();
+  // Also show banner after 2s on menu screen
   setTimeout(() => {
-    if(document.getElementById('menuScreen') && !document.getElementById('menuScreen').classList.contains('hidden')){
+    if(!document.getElementById('menuScreen').classList.contains('hidden')){
       showInstallBanner();
     }
-  }, 3000);
+  }, 2000);
 });
 
-// Also show banner when user reaches menu
-function maybeShowInstallBanner(){
-  if(deferredPrompt && !localStorage.getItem('pwa_dismissed')){
-    setTimeout(showInstallBanner, 2500);
+function showPWAButton(){
+  const btn = document.getElementById('pwaBtn');
+  const txt = document.getElementById('pwaBtnText');
+  if(btn){
+    btn.style.display = 'flex';
+    if(txt) txt.textContent = LANG==='zh' ? '安装 App' : 'Install App';
+  }
+}
+
+function handlePWAInstall(){
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isAndroid = /android/i.test(navigator.userAgent);
+
+  if(deferredPrompt){
+    // Android Chrome with prompt available
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(r => {
+      if(r.outcome === 'accepted'){
+        toast(LANG==='zh' ? '🎉 安装成功！在主屏幕找到游戏！' : '🎉 Installed! Check your home screen!');
+        document.getElementById('pwaBtn').style.display='none';
+      }
+      deferredPrompt = null;
+    });
+  } else if(isIOS){
+    // iOS instructions
+    const msg = LANG==='zh'
+      ? '📱 iOS 安装步骤：\n\n1. 点底部「分享」按钮 ⬆\n2. 选「添加到主屏幕」\n3. 点「添加」✅\n\n注意：需用 Safari 浏览器'
+      : '📱 iOS Install Steps:\n\n1. Tap the Share button ⬆ at the bottom\n2. Select "Add to Home Screen"\n3. Tap "Add" ✅\n\nNote: Must use Safari browser';
+    alert(msg);
+  } else if(isAndroid){
+    // Android - prompt not available, show manual instructions
+    const msg = LANG==='zh'
+      ? '📱 Android 安装步骤：\n\n1. 点 Chrome 右上角 ⋮ 菜单\n2. 选「添加到主屏幕」\n3. 点「安装」✅'
+      : '📱 Android Install Steps:\n\n1. Tap ⋮ menu (top right in Chrome)\n2. Select "Add to Home Screen"\n3. Tap "Install" ✅';
+    alert(msg);
+  } else {
+    // Desktop
+    const msg = LANG==='zh'
+      ? '💻 电脑安装步骤：\n\n在 Chrome 地址栏右边\n找到 ⊕ 安装图标点击即可！\n\n如果没有图标，请用手机安装。'
+      : '💻 Desktop Install:\n\nLook for the ⊕ install icon\nin Chrome address bar!\n\nOr use your mobile phone instead.';
+    alert(msg);
   }
 }
 
@@ -1670,7 +1709,6 @@ function showInstallBanner(){
   const title = document.getElementById('installTitle');
   const sub = document.getElementById('installSub');
   const btn = document.getElementById('installBtn');
-  // Update text based on language
   if(LANG === 'zh'){
     title.textContent = '📲 安装 Smash Fever！';
     sub.textContent = '像 App 一样游玩 · 无需应用商店';
@@ -1684,18 +1722,8 @@ function showInstallBanner(){
 }
 
 function triggerInstall(){
-  const banner = document.getElementById('installBanner');
-  banner.classList.remove('show');
-  if(deferredPrompt){
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(result => {
-      if(result.outcome === 'accepted'){
-        toast(LANG==='zh' ? '🎉 安装成功！在主屏幕找到游戏！' : '🎉 Installed! Find it on your home screen!');
-        localStorage.setItem('pwa_installed','1');
-      }
-      deferredPrompt = null;
-    });
-  }
+  document.getElementById('installBanner').classList.remove('show');
+  handlePWAInstall();
 }
 
 function dismissInstall(){
@@ -1703,17 +1731,38 @@ function dismissInstall(){
   localStorage.setItem('pwa_dismissed','1');
 }
 
-// Show banner when app installed
-window.addEventListener('appinstalled', () => {
-  toast(LANG==='zh' ? '🎉 U宝已安装到主屏幕！' : '🎉 Smash Fever installed to home screen!');
-  deferredPrompt = null;
+// Show button for iOS users too (they can't get beforeinstallprompt)
+window.addEventListener('load', () => {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if(isIOS && !isStandalone){
+    // Show button for iOS after login
+    setTimeout(showPWAButton, 500);
+  }
 });
 
-// Hook into showScreen to trigger install banner on menu
+window.addEventListener('appinstalled', () => {
+  toast(LANG==='zh' ? '🎉 U宝已安装到主屏幕！' : '🎉 Installed to home screen!');
+  deferredPrompt = null;
+  const btn = document.getElementById('pwaBtn');
+  if(btn) btn.style.display = 'none';
+});
+
 const _origShowScreen = showScreen;
 window.showScreen = function(id){
   _origShowScreen(id);
-  if(id === 'menuScreen') maybeShowInstallBanner();
+  if(id === 'menuScreen'){
+    // Show PWA button if prompt available or iOS
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if((deferredPrompt || isIOS) && !isStandalone){
+      showPWAButton();
+    }
+    // Show banner
+    if(deferredPrompt && !localStorage.getItem('pwa_dismissed')){
+      setTimeout(showInstallBanner, 2500);
+    }
+  }
 };
 </script>
 </body>
