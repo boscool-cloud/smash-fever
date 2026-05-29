@@ -27,6 +27,8 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<!-- QR Code generator -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+SC:wght@500;700;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -257,6 +259,48 @@ body.lang-zh{font-family:'Noto Sans SC','Nunito',sans-serif}
 @keyframes spinning{to{transform:rotate(360deg)}}
 .loading-txt{font-size:15px;color:var(--muted);font-weight:700}
 .firebase-err{background:rgba(244,67,54,.1);border:1px solid rgba(244,67,54,.3);border-radius:12px;padding:14px 18px;max-width:380px;width:100%;font-size:14px;color:#EF9A9A;text-align:center;margin-top:10px;display:none}
+/* FEVER MODE */
+.fever-active #fieldEl{animation:fever-shake 0.18s infinite alternate}
+@keyframes fever-shake{0%{transform:translateX(-1.5px)}100%{transform:translateX(1.5px)}}
+.fever-hud{background:linear-gradient(135deg,rgba(255,109,0,.35),rgba(244,67,54,.2))!important;border-bottom-color:rgba(255,109,0,.5)!important}
+.fever-badge{position:absolute;top:60px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FF6D00,#F44336);border-radius:22px;padding:6px 18px;font-family:'Fredoka One',cursive;font-size:17px;color:#fff;letter-spacing:1px;text-shadow:0 0 12px rgba(255,109,0,.9);z-index:20;animation:badge-pulse .6s infinite alternate;white-space:nowrap;display:none}
+@keyframes badge-pulse{0%{transform:translateX(-50%) scale(1)}100%{transform:translateX(-50%) scale(1.1)}}
+.speed-badge{position:absolute;bottom:10px;right:12px;font-size:11px;font-weight:800;color:var(--muted);z-index:8;background:rgba(0,0,0,.45);border-radius:8px;padding:3px 9px;letter-spacing:.3px}
+/* EXIT BUTTON & MODAL */
+.exit-btn{position:absolute;top:8px;right:10px;background:rgba(244,67,54,.12);border:1px solid rgba(244,67,54,.25);border-radius:10px;padding:6px 12px;color:#EF9A9A;font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;z-index:30;transition:background .2s;white-space:nowrap}
+.exit-btn:active{background:rgba(244,67,54,.28)}
+.exit-modal,.share-modal,.sound-ov{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
+.exit-modal.hidden,.share-modal.hidden,.sound-ov.hidden{display:none!important}
+.exit-box{background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px 22px;width:100%;max-width:340px;text-align:center}
+.exit-icon{font-size:52px;display:block;margin-bottom:12px}
+.exit-title{font-family:'Fredoka One',cursive;font-size:24px;color:#EF9A9A;margin-bottom:8px}
+.exit-sub{font-size:14px;color:var(--muted);margin-bottom:22px;line-height:1.5}
+.exit-btns{display:flex;gap:10px}
+.btn-continue{flex:1;padding:13px;background:linear-gradient(135deg,#43A047,#00897B);border:none;border-radius:10px;color:#fff;font-weight:800;font-size:15px;font-family:inherit;cursor:pointer}
+.btn-quit{flex:1;padding:13px;background:rgba(244,67,54,.15);border:1px solid rgba(244,67,54,.3);border-radius:10px;color:#EF9A9A;font-weight:800;font-size:15px;font-family:inherit;cursor:pointer}
+/* SOUND PROMPT */
+.sound-box{background:var(--card);border:1px solid rgba(76,175,80,.25);border-radius:22px;padding:28px 24px;width:100%;max-width:360px;text-align:center}
+.sound-icon{font-size:56px;display:block;margin-bottom:14px;animation:sound-pulse 1.3s ease infinite alternate}
+@keyframes sound-pulse{0%{transform:scale(1)}100%{transform:scale(1.15)}}
+.sound-title{font-family:'Fredoka One',cursive;font-size:22px;color:var(--green2);margin-bottom:10px}
+.sound-msg{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:20px}
+.btn-got-it{width:100%;padding:14px;background:linear-gradient(135deg,#43A047,#00897B);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:16px;font-weight:900;cursor:pointer}
+/* SHARE MODAL */
+.share-box-modal{background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:22px 20px;width:100%;max-width:380px;max-height:92vh;overflow-y:auto}
+.share-card-preview-box{background:linear-gradient(135deg,#0d2a1a,#0a1628);border:1px solid rgba(76,175,80,.3);border-radius:16px;padding:18px;margin-bottom:14px;text-align:center}
+.share-platforms{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.sp-btn{background:var(--card2);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:transform .15s,background .2s}
+.sp-btn:active{transform:scale(.92);background:rgba(255,255,255,.1)}
+.sp-icon{font-size:24px}
+.sp-label{font-size:10px;font-weight:700;color:var(--muted)}
+/* QR CODE */
+.qr-wrap{display:flex;justify-content:center;padding:10px 0}
+.qr-wrap>div{border-radius:10px;overflow:hidden;border:3px solid rgba(76,175,80,.35)!important}
+/* ADMIN EXPORT */
+.export-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.export-btn{padding:8px 14px;background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.22);border-radius:10px;color:var(--green2);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:background .2s}
+.export-btn:active{background:rgba(76,175,80,.22)}
+.badge-pending{background:rgba(255,183,0,.15);color:#FFD54F;border:1px solid rgba(255,183,0,.3);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block}
 /* PWA INSTALL BANNER */
 .install-banner{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#0d2a1a,#111f38);border-top:1px solid rgba(76,175,80,.3);padding:14px 20px;display:flex;align-items:center;gap:12px;z-index:800;transform:translateY(110%);transition:transform .4s cubic-bezier(.175,.885,.32,1.275)}
 .install-banner.show{transform:translateY(0)}
@@ -307,6 +351,51 @@ body.lang-zh{font-family:'Noto Sans SC','Nunito',sans-serif}
   <div class="loading-txt" id="loadingTxt">Loading...</div>
 </div>
 
+<!-- SOUND PROMPT (first visit) -->
+<div class="sound-ov hidden" id="soundOv">
+  <div class="sound-box">
+    <span class="sound-icon">🔊</span>
+    <div class="sound-title" id="soundTitle">Turn On Your Sound!</div>
+    <div class="sound-msg" id="soundMsg">🎮 For the best game experience,<br>please turn on your device media volume.<br><br>为获得最佳游戏体验，<br>请开启手机媒体音量。</div>
+    <button class="btn-got-it" onclick="closeSoundPrompt()" id="soundOkBtn">✅ Got it! / 我知道了</button>
+  </div>
+</div>
+
+<!-- EXIT CONFIRMATION MODAL -->
+<div class="exit-modal hidden" id="exitModal">
+  <div class="exit-box">
+    <span class="exit-icon">🤔</span>
+    <div class="exit-title" id="exitTitle">Quit Game?</div>
+    <div class="exit-sub" id="exitSub">Your current game progress will be saved for statistics.</div>
+    <div class="exit-btns">
+      <button class="btn-continue" onclick="closeExitModal()" id="exitContinueBtn">▶ Keep Playing</button>
+      <button class="btn-quit" onclick="confirmExit()" id="exitQuitBtn">✕ Quit</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="share-modal hidden" id="shareModal" onclick="if(event.target===this)this.classList.add('hidden')">
+  <div class="share-box-modal">
+    <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--green2);margin-bottom:6px" id="shareModalTitle">📤 Share Your Result!</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:14px" id="shareModalSub">Challenge your friends!</div>
+    <div class="share-card-preview-box" id="shareCardPreview">
+      <svg width="60" height="60" style="display:block;margin:0 auto 10px"><use href="#ubao"/></svg>
+      <div style="font-family:'Fredoka One',cursive;font-size:30px;color:var(--yellow)" id="scScore">0</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">Smash Fever · U宝 Edition</div>
+    </div>
+    <div class="share-platforms">
+      <div class="sp-btn" onclick="shareTo('whatsapp')"><span class="sp-icon">💬</span><span class="sp-label">WhatsApp</span></div>
+      <div class="sp-btn" onclick="shareTo('telegram')"><span class="sp-icon">✈️</span><span class="sp-label">Telegram</span></div>
+      <div class="sp-btn" onclick="shareTo('twitter')"><span class="sp-icon">🐦</span><span class="sp-label">X / Twitter</span></div>
+      <div class="sp-btn" onclick="shareTo('facebook')"><span class="sp-icon">👥</span><span class="sp-label">Facebook</span></div>
+      <div class="sp-btn" onclick="shareTo('copy')"><span class="sp-icon">📋</span><span class="sp-label" id="copyLinkLabel">Copy Link</span></div>
+      <div class="sp-btn" onclick="shareTo('native')"><span class="sp-icon">📤</span><span class="sp-label">More...</span></div>
+    </div>
+    <button class="btn-back" style="width:100%;justify-content:center" onclick="document.getElementById('shareModal').classList.add('hidden')" id="shareCloseBtn">Close</button>
+  </div>
+</div>
+
 <div class="stars" id="starsEl"></div>
 <div class="hmr" id="hmrEl"></div>
 <div class="hit-flash" id="flashEl"></div>
@@ -342,32 +431,101 @@ body.lang-zh{font-family:'Noto Sans SC','Nunito',sans-serif}
   <button class="install-dismiss" onclick="dismissInstall()">×</button>
 </div>
 
-<!-- ===== UBAO SVG TEMPLATE (reused) ===== -->
-<svg style="display:none">
+<!-- ===== U宝 SVG — 渐变在 symbol 外部（正确写法）===== -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
 <defs>
-<symbol id="ubao" viewBox="0 0 100 100">
-  <ellipse cx="50" cy="72" rx="28" ry="24" fill="#e8f5e9"/>
-  <ellipse cx="50" cy="76" rx="26" ry="20" fill="#4CAF50"/>
-  <ellipse cx="50" cy="78" rx="16" ry="14" fill="#e8f5e9"/>
-  <path d="M36 64 Q50 58 64 64 Q58 72 50 74 Q42 72 36 64Z" fill="#81C784"/>
-  <ellipse cx="50" cy="44" rx="26" ry="24" fill="#FFCCBC"/>
-  <path d="M24 44 Q24 20 50 18 Q76 20 76 44 Q76 32 50 28 Q24 32 24 44Z" fill="#43A047"/>
-  <ellipse cx="26" cy="36" rx="7" ry="8" fill="#43A047"/>
-  <ellipse cx="74" cy="36" rx="7" ry="8" fill="#43A047"/>
-  <ellipse cx="26" cy="36" rx="4" ry="5" fill="#66BB6A"/>
-  <ellipse cx="74" cy="36" rx="4" ry="5" fill="#66BB6A"/>
-  <ellipse cx="34" cy="50" rx="7" ry="5" fill="#FFAB91" opacity=".7"/>
-  <ellipse cx="66" cy="50" rx="7" ry="5" fill="#FFAB91" opacity=".7"/>
-  <ellipse cx="41" cy="44" rx="5" ry="5.5" fill="#1a1a1a"/>
-  <ellipse cx="59" cy="44" rx="5" ry="5.5" fill="#1a1a1a"/>
-  <ellipse cx="42.5" cy="42.5" rx="2" ry="2" fill="#fff"/>
-  <ellipse cx="60.5" cy="42.5" rx="2" ry="2" fill="#fff"/>
-  <path d="M37 39 Q41 37 45 39" stroke="#333" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-  <path d="M55 39 Q59 37 63 39" stroke="#333" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-  <path d="M42 54 Q50 60 58 54" stroke="#c0392b" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <ellipse cx="22" cy="68" rx="8" ry="10" fill="#e8f5e9" transform="rotate(-20 22 68)"/>
-  <ellipse cx="78" cy="68" rx="8" ry="10" fill="#e8f5e9" transform="rotate(20 78 68)"/>
-</symbol>
+  <!-- ✅ 渐变定义在 symbol 外面，浏览器才能正确读取 -->
+  <radialGradient id="ubHood" cx="35%" cy="25%" r="65%" gradientUnits="objectBoundingBox">
+    <stop offset="0%" stop-color="#7EE065"/>
+    <stop offset="35%" stop-color="#4CAF50"/>
+    <stop offset="100%" stop-color="#1A5C20"/>
+  </radialGradient>
+  <radialGradient id="ubFace" cx="34%" cy="28%" r="64%" gradientUnits="objectBoundingBox">
+    <stop offset="0%" stop-color="#FFE2D0"/>
+    <stop offset="48%" stop-color="#FFCCBC"/>
+    <stop offset="100%" stop-color="#C07858"/>
+  </radialGradient>
+  <radialGradient id="ubBody" cx="35%" cy="22%" r="72%" gradientUnits="objectBoundingBox">
+    <stop offset="0%" stop-color="#FFFFFF"/>
+    <stop offset="50%" stop-color="#F5F5F5"/>
+    <stop offset="100%" stop-color="#CCCCCC"/>
+  </radialGradient>
+  <radialGradient id="ubEar" cx="36%" cy="30%" r="62%" gradientUnits="objectBoundingBox">
+    <stop offset="0%" stop-color="#6CC857"/>
+    <stop offset="100%" stop-color="#2B7830"/>
+  </radialGradient>
+  <radialGradient id="ubEarIn" cx="40%" cy="35%" r="58%" gradientUnits="objectBoundingBox">
+    <stop offset="0%" stop-color="#80D868"/>
+    <stop offset="100%" stop-color="#4CAF50"/>
+  </radialGradient>
+  <radialGradient id="ubCollar" cx="36%" cy="26%" r="65%" gradientUnits="objectBoundingBox">
+    <stop offset="0%" stop-color="#68C060"/>
+    <stop offset="100%" stop-color="#357A38"/>
+  </radialGradient>
+  <filter id="ubDrop" x="-25%" y="-25%" width="150%" height="160%">
+    <feDropShadow dx="1" dy="3" stdDeviation="2.5" flood-color="#00000040"/>
+  </filter>
+  <filter id="ubBlush" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="2.2"/>
+  </filter>
+
+  <!-- ✅ U宝 symbol — 严格对照参考图 -->
+  <symbol id="ubao" viewBox="0 0 100 100" overflow="visible">
+    <!-- 脚 -->
+    <ellipse cx="41" cy="91" rx="9" ry="7" fill="url(#ubBody)"/>
+    <ellipse cx="59" cy="91" rx="9" ry="7" fill="url(#ubBody)"/>
+    <ellipse cx="39" cy="89.5" rx="4" ry="3" fill="rgba(255,255,255,.5)"/>
+    <ellipse cx="61" cy="89.5" rx="4" ry="3" fill="rgba(255,255,255,.5)"/>
+    <!-- 身体 -->
+    <ellipse cx="50" cy="76" rx="23" ry="20" fill="url(#ubBody)" filter="url(#ubDrop)"/>
+    <ellipse cx="41" cy="68" rx="7.5" ry="5.5" fill="rgba(255,255,255,.5)" transform="rotate(-15 41 68)"/>
+    <!-- 绿色 U 形衣领 -->
+    <path d="M33 69 Q50 62 67 69 Q60 79 50 81 Q40 79 33 69Z" fill="#326B35"/>
+    <path d="M36 70.5 Q50 64.5 64 70.5 Q58 78.5 50 80 Q42 78.5 36 70.5Z" fill="url(#ubCollar)"/>
+    <ellipse cx="42" cy="69.5" rx="5" ry="3.5" fill="rgba(255,255,255,.3)" transform="rotate(-12 42 69.5)"/>
+    <!-- 手臂 -->
+    <ellipse cx="27" cy="74" rx="8" ry="10" fill="url(#ubBody)" transform="rotate(-15 27 74)" filter="url(#ubDrop)"/>
+    <ellipse cx="73" cy="74" rx="8" ry="10" fill="url(#ubBody)" transform="rotate(15 73 74)" filter="url(#ubDrop)"/>
+    <ellipse cx="25" cy="70" rx="3.5" ry="5" fill="rgba(255,255,255,.5)" transform="rotate(-15 25 70)"/>
+    <ellipse cx="75" cy="70" rx="3.5" ry="5" fill="rgba(255,255,255,.5)" transform="rotate(15 75 70)"/>
+    <!-- 绿色大帽子（最大元素，从参考图看几乎是球形） -->
+    <ellipse cx="50" cy="37" rx="35" ry="33" fill="url(#ubHood)" filter="url(#ubDrop)"/>
+    <!-- 帽子高光（球形左上角） -->
+    <ellipse cx="31" cy="17" rx="13" ry="8.5" fill="rgba(255,255,255,.3)" transform="rotate(-25 31 17)"/>
+    <ellipse cx="23" cy="28" rx="6" ry="4" fill="rgba(255,255,255,.14)" transform="rotate(-15 23 28)"/>
+    <!-- 帽子顶部小凸起（参考图有） -->
+    <ellipse cx="50" cy="6" rx="5.5" ry="4.5" fill="url(#ubEar)"/>
+    <ellipse cx="50" cy="5.5" rx="3" ry="2.5" fill="rgba(255,255,255,.22)"/>
+    <!-- 两侧熊耳朵 -->
+    <ellipse cx="22" cy="18" rx="9.5" ry="10.5" fill="url(#ubEar)" filter="url(#ubDrop)"/>
+    <ellipse cx="22" cy="18" rx="6" ry="6.5" fill="url(#ubEarIn)"/>
+    <ellipse cx="21" cy="16" rx="2.5" ry="3" fill="rgba(255,255,255,.24)"/>
+    <ellipse cx="78" cy="18" rx="9.5" ry="10.5" fill="url(#ubEar)" filter="url(#ubDrop)"/>
+    <ellipse cx="78" cy="18" rx="6" ry="6.5" fill="url(#ubEarIn)"/>
+    <ellipse cx="79" cy="16" rx="2.5" ry="3" fill="rgba(255,255,255,.24)"/>
+    <!-- 脸（苹果肉脸，从帽子开口露出） -->
+    <ellipse cx="50" cy="45" rx="24" ry="23" fill="url(#ubFace)"/>
+    <ellipse cx="38" cy="35" rx="9" ry="6" fill="rgba(255,255,255,.28)" transform="rotate(-18 38 35)"/>
+    <!-- 红脸颊（参考图非常明显） -->
+    <ellipse cx="30" cy="50" rx="10" ry="7.5" fill="#FF6B5A" opacity=".5" filter="url(#ubBlush)"/>
+    <ellipse cx="70" cy="50" rx="10" ry="7.5" fill="#FF6B5A" opacity=".5" filter="url(#ubBlush)"/>
+    <!-- 眉毛：参考图是粗短黑条，略带皱眉 -->
+    <rect x="33" y="33.5" width="15" height="4.5" rx="2.2" fill="#1C1C1C" transform="rotate(6 33 33.5)"/>
+    <rect x="52" y="33.5" width="15" height="4.5" rx="2.2" fill="#1C1C1C" transform="rotate(-6 67 33.5)"/>
+    <!-- 眼睛（参考图：小圆黑点，有反光） -->
+    <ellipse cx="41" cy="43" rx="5.5" ry="6" fill="#1A1A1A"/>
+    <ellipse cx="59" cy="43" rx="5.5" ry="6" fill="#1A1A1A"/>
+    <!-- 主反光 -->
+    <ellipse cx="44" cy="40" rx="2.5" ry="2.5" fill="white"/>
+    <ellipse cx="62" cy="40" rx="2.5" ry="2.5" fill="white"/>
+    <!-- 次反光 -->
+    <ellipse cx="39.5" cy="45" rx="1.2" ry="1.2" fill="rgba(255,255,255,.38)"/>
+    <ellipse cx="57.5" cy="45" rx="1.2" ry="1.2" fill="rgba(255,255,255,.38)"/>
+    <!-- 鼻子（参考图很小） -->
+    <ellipse cx="50" cy="52" rx="2.2" ry="1.6" fill="#A06848" opacity=".65"/>
+    <!-- 嘴巴（参考图：小小的下弯） -->
+    <path d="M44 57 Q50 62 56 57" stroke="#9A4030" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  </symbol>
 </defs>
 </svg>
 
@@ -512,7 +670,7 @@ body.lang-zh{font-family:'Noto Sans SC','Nunito',sans-serif}
 
 <!-- GAME -->
 <div class="screen hidden" id="gameScreen">
-  <div class="hud">
+  <div class="hud" id="gameHud">
     <div class="hud-block">
       <div class="hud-lbl" data-i18n="hud_score">Score</div>
       <div class="hud-val" id="hScore">0</div>
@@ -525,8 +683,13 @@ body.lang-zh{font-family:'Noto Sans SC','Nunito',sans-serif}
       <div class="hud-lbl" data-i18n="hud_best">Best</div>
       <div class="hud-val sm" id="hBest">0</div>
     </div>
+    <button class="exit-btn" onclick="showExitModal()" id="exitGameBtn">✕ Exit</button>
   </div>
+  <!-- Fever Mode badge -->
+  <div class="fever-badge" id="feverBadge">🔥 FEVER MODE!</div>
   <div class="combo-hud hidden" id="comboEl"></div>
+  <!-- Speed tier indicator -->
+  <div class="speed-badge hidden" id="speedBadge">⚡ SPEED UP</div>
 
   <div class="field" id="fieldEl">
     <div class="grass"></div>
@@ -594,17 +757,25 @@ body.lang-zh{font-family:'Noto Sans SC','Nunito',sans-serif}
 <div class="modal-ov hidden" id="invModal" onclick="if(event.target===this)this.classList.add('hidden')">
   <div class="modal-box">
     <div class="modal-t" data-i18n="inv_title">🔗 Invite & Earn!</div>
-    <div class="modal-s" data-i18n="inv_sub">Share your code · earn RM8 per friend · max RM88!</div>
+    <div class="modal-s" data-i18n="inv_sub">Share your code · earn RM8 U88 Credit per friend · max RM88!</div>
     <div class="code-box">
       <div class="code-val" id="myCode">UBAO-????</div>
       <div class="code-sub" data-i18n="inv_code_sub">Your personal invite code</div>
     </div>
-    <div class="tier-list">
-      <div class="tier"><span class="tier-l" data-i18n="inv_t1">🎯 Cumulative 88,888+ pts</span><span class="tier-r" data-i18n="inv_r1">RM88 credit</span></div>
-      <div class="tier"><span class="tier-l" data-i18n="inv_t2">👥 Per friend registered</span><span class="tier-r" data-i18n="inv_r2">+RM8</span></div>
-      <div class="tier"><span class="tier-l" data-i18n="inv_t3">🏆 Maximum total reward</span><span class="tier-r" data-i18n="inv_r3">RM88</span></div>
+    <!-- Referral Link Row -->
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;margin-bottom:14px">
+      <div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px" data-i18n="inv_link_label">Your Referral Link</div>
+      <div style="font-size:12px;color:var(--green2);word-break:break-all;font-weight:600" id="refLinkDisplay">Loading...</div>
     </div>
-    <button class="btn-copy" onclick="copyCode()" data-i18n="inv_copy">📋 Copy Invite Code + Link</button>
+    <!-- QR Code -->
+    <div class="qr-wrap" id="qrContainer"></div>
+    <div class="tier-list">
+      <div class="tier"><span class="tier-l" data-i18n="inv_t1">🎯 Cumulative 88,888+ pts</span><span class="tier-r" data-i18n="inv_r1">RM88 U88 Credit</span></div>
+      <div class="tier"><span class="tier-l" data-i18n="inv_t2">👥 Per friend registered</span><span class="tier-r" data-i18n="inv_r2">+RM8 U88 Credit</span></div>
+      <div class="tier"><span class="tier-l" data-i18n="inv_t3">🏆 Maximum total reward</span><span class="tier-r" data-i18n="inv_r3">RM88 U88 Credit</span></div>
+    </div>
+    <button class="btn-copy" onclick="copyRefLink()" data-i18n="inv_copy">📋 Copy Invite Link</button>
+    <button class="btn-copy" style="margin-top:8px;background:linear-gradient(135deg,#1565C0,#0D47A1)" onclick="shareRefLink()">📤 <span data-i18n="inv_share">Share Link</span></button>
     <button class="btn-close" onclick="document.getElementById('invModal').classList.add('hidden')" data-i18n="btn_close">Close</button>
   </div>
 </div>
@@ -631,7 +802,7 @@ const I18N = {
     menu_daily_done: "Come back tomorrow for more!",
     menu_claim: "Claim!",
     menu_claimed: "✓ Done",
-    menu_invite_title: "Invite Friends, Earn RM8!",
+    menu_invite_title: "Invite Friends, Earn RM8 U88 Credit!",
     menu_invite_line: "{n} referrals · Max RM88 total",
     menu_play: "PLAY NOW",
     menu_play_sub: "Start smashing!",
@@ -666,12 +837,14 @@ const I18N = {
     admin_title: "🔐 Admin Dashboard",
     tab_overview: "Overview", tab_players: "Players", tab_lb: "Leaderboard", tab_rewards: "Rewards",
     inv_title: "🔗 Invite & Earn!",
-    inv_sub: "Share your code · earn RM8 per friend · max RM88!",
+    inv_sub: "Share your code · earn RM8 U88 Credit per friend · max RM88!",
     inv_code_sub: "Your personal invite code",
-    inv_t1: "🎯 Cumulative 88,888+ pts", inv_r1: "RM88 credit",
-    inv_t2: "👥 Per friend registered", inv_r2: "+RM8",
-    inv_t3: "🏆 Maximum total reward", inv_r3: "RM88",
-    inv_copy: "📋 Copy Invite Code + Link",
+    inv_t1: "🎯 Cumulative 88,888+ pts", inv_r1: "RM88 U88 Credit",
+    inv_t2: "👥 Per friend registered", inv_r2: "+RM8 U88 Credit",
+    inv_t3: "🏆 Maximum total reward", inv_r3: "RM88 U88 Credit",
+    inv_copy: "📋 Copy Invite Link",
+    inv_link_label: "Your Referral Link",
+    inv_share: "Share Link",
     // Toasts
     t_no_name: "Please enter your name 😊",
     t_bad_phone: "Enter a valid phone number 📱",
@@ -679,16 +852,16 @@ const I18N = {
     t_welcome_back: "Welcome back, {name}! 🐸",
     t_already_bonus: "Already claimed today! 🌟",
     t_bonus_got: "🎁 Daily Bonus! +{n} pts!",
-    t_rm88_unlock: "🎉 88,888 total pts! RM88 unlocked!",
-    t_rm88_after: "🎉 AMAZING! RM88 credit is yours!",
+    t_rm88_unlock: "🎉 88,888 pts! RM88 U88 Credit pending review!",
+    t_rm88_after: "🎉 88,888 pts reached! RM88 U88 Credit pending admin review!",
     t_copied: "📋 Copied! Send to your friends!",
     t_share_copied: "📋 Battle card copied! Share away!",
     t_wrong_pw: "Wrong password ❌",
     t_admin_pw: "Admin Password:",
     // Progress card
-    prog_label: "Progress to RM88",
+    prog_label: "Progress to RM88 U88 Credit",
     prog_remaining: "Need {n} more cumulative pts!",
-    prog_unlocked: "🎉 RM88 Reward Unlocked!",
+    prog_unlocked: "🎉 RM88 U88 Credit Unlocked!",
     // Game text
     g_miss: "Miss!",
     g_smash: "Smash them all!",
@@ -710,8 +883,8 @@ const I18N = {
     r_t3: "Awesome! 🤩",
     r_t4: "AMAZING! 🔥",
     r_t5: "LEGENDARY! 🏆👑",
-    r_rm88_title: "🎉 RM88 Reward Unlocked!",
-    r_rm88_sub: "RM88 free credit added! Contact support to claim.",
+    r_rm88_title: "🎉 RM88 U88 Credit Unlocked!",
+    r_rm88_sub: "🎉 RM88 U88 Credit awarded! Pending admin review & approval.",
     r_keep_title: "📊 Keep Smashing!",
     r_keep_sub: "Need {n} more cumulative pts for RM88!",
     // mascot
@@ -752,7 +925,7 @@ const I18N = {
     menu_daily_done: "明天再来领取更多！",
     menu_claim: "领取！",
     menu_claimed: "✓ 已领",
-    menu_invite_title: "邀请朋友，赚取 RM8！",
+    menu_invite_title: "邀请朋友，赚取 RM8 U88 Credit！",
     menu_invite_line: "已邀请 {n} 人 · 最高 RM88",
     menu_play: "立即游戏",
     menu_play_sub: "开始打地鼠！",
@@ -789,8 +962,8 @@ const I18N = {
     inv_title: "🔗 邀请赚奖励！",
     inv_sub: "分享你的代码 · 每位朋友 RM8 · 最高 RM88！",
     inv_code_sub: "你的专属邀请码",
-    inv_t1: "🎯 累积得分 88,888+", inv_r1: "RM88 现金奖励",
-    inv_t2: "👥 每邀请 1 位朋友", inv_r2: "+RM8",
+    inv_t1: "🎯 累积得分 88,888+", inv_r1: "RM88 U88 Credit",
+    inv_t2: "👥 每邀请 1 位朋友", inv_r2: "+RM8 U88 Credit",
     inv_t3: "🏆 最高累积奖励", inv_r3: "RM88",
     inv_copy: "📋 复制邀请码与链接",
     t_no_name: "请输入你的名字 😊",
@@ -799,15 +972,15 @@ const I18N = {
     t_welcome_back: "欢迎回来，{name}！🐸",
     t_already_bonus: "今天已领取过了！明天再来 🌟",
     t_bonus_got: "🎁 每日奖励！+{n} 积分！",
-    t_rm88_unlock: "🎉 累积 88,888 分！RM88 已解锁！",
-    t_rm88_after: "🎉 太棒了！RM88 奖励是你的了！",
+    t_rm88_unlock: "🎉 88,888分！RM88 U88 Credit 等待审核！",
+    t_rm88_after: "🎉 达到88,888分！RM88 U88 Credit等待管理员审核！",
     t_copied: "📋 已复制！发送给你的朋友吧！",
     t_share_copied: "📋 战绩卡片已复制！快去分享！",
     t_wrong_pw: "密码错误 ❌",
     t_admin_pw: "管理员密码：",
-    prog_label: "RM88 奖励进度",
+    prog_label: "RM88 U88 Credit 进度",
     prog_remaining: "还差 {n} 分累积解锁！",
-    prog_unlocked: "🎉 RM88 奖励已解锁！",
+    prog_unlocked: "🎉 RM88 U88 Credit 已解锁！",
     g_miss: "未中！",
     g_smash: "全部打掉它们！",
     g_gold: "瞄准金色 U宝！🌟",
@@ -827,8 +1000,8 @@ const I18N = {
     r_t3: "太棒了！🤩",
     r_t4: "惊人！🔥",
     r_t5: "传奇！🏆👑",
-    r_rm88_title: "🎉 RM88 奖励已解锁！",
-    r_rm88_sub: "RM88 已加入账户！联系客服领取。",
+    r_rm88_title: "🎉 RM88 U88 Credit 已解锁！ 等待审核",
+    r_rm88_sub: "RM88 U88 Credit 已加入账户，等待客服审核后发放。",
     r_keep_title: "📊 继续努力！",
     r_keep_sub: "还需累积 {n} 分即可解锁 RM88！",
     m1: "全部打掉它们！💪", m2: "目标：累积 88,888 分！🎯", m3: "金色 U宝 = 50 分！🌟",
@@ -1079,6 +1252,7 @@ async function doLogin(){
       toast(t('t_welcome_back',{name:player.name}));
     }
     DB.set('sess', phone);
+    DB.set('pendingRef', null);
     CU=player;
     showScreen('menuScreen');
     updateMenuUI();
@@ -1201,8 +1375,10 @@ function startCD(){
 // =================== GAME ===================
 function startGame(){
   score=0;timeLeft=60;gActive=true;combo=0;hits=0;misses=0;maxCombo=0;totalSpawn=0;
+  currentTier=0;feverActive=false;
   gameStartTotal=CU?.totalScore||0;
   buildHoles();updateHUD();setupHammer();
+  deactivateFever();
   gTimer=setInterval(()=>{
     timeLeft--;updateHUD();
     if(timeLeft<=10){
@@ -1242,10 +1418,71 @@ function buildHoles(){
   }
 }
 
+// =================== SPEED TIERS ===================
+const SPEED_TIERS = [
+  {min:0,     max:2000,  label:'',           mult:1.0,  fever:false},
+  {min:2001,  max:5000,  label:'⚡ SPEED UP', mult:1.15, fever:false},
+  {min:5001,  max:8000,  label:'⚡⚡ FASTER!', mult:1.30, fever:false},
+  {min:8001,  max:12000, label:'⚡⚡⚡ TURBO!', mult:1.50, fever:false},
+  {min:12001, max:Infinity,label:'🔥 FEVER!',  mult:1.75, fever:true},
+];
+let currentTier=0;
+let feverActive=false;
+
+function getSpeedTier(s){
+  return SPEED_TIERS.findIndex(t=>s>=t.min&&s<=t.max)||0;
+}
+
+function updateSpeedTier(){
+  const tier=SPEED_TIERS.findIndex(t=>score>=t.min&&score<=t.max);
+  if(tier<0||tier===currentTier)return;
+  currentTier=tier;
+  const td=SPEED_TIERS[tier];
+  // Show speed badge
+  const badge=document.getElementById('speedBadge');
+  if(badge&&td.label){
+    badge.textContent=td.label;
+    badge.classList.remove('hidden');
+    clearTimeout(badge._t);
+    badge._t=setTimeout(()=>badge.classList.add('hidden'),2000);
+  }
+  // Fever Mode
+  if(td.fever&&!feverActive){
+    feverActive=true;
+    activateFever();
+  }
+}
+
+function activateFever(){
+  const gs=document.getElementById('gameScreen');
+  const hud=document.getElementById('gameHud');
+  const fb=document.getElementById('feverBadge');
+  if(gs)gs.classList.add('fever-active');
+  if(hud)hud.classList.add('fever-hud');
+  if(fb){fb.style.display='block';}
+  sfxCombo();sfxCombo();
+  toast(LANG==='zh'?'🔥 狂热模式启动！连击倍率提升！':'🔥 FEVER MODE! Combo multiplier boosted!');
+}
+
+function deactivateFever(){
+  feverActive=false;
+  currentTier=0;
+  const gs=document.getElementById('gameScreen');
+  const hud=document.getElementById('gameHud');
+  const fb=document.getElementById('feverBadge');
+  if(gs)gs.classList.remove('fever-active');
+  if(hud)hud.classList.remove('fever-hud');
+  if(fb){fb.style.display='none';}
+}
+
 function scheduleMoles(){
   if(!gActive)return;
-  const speed=Math.max(350,1100-(60-timeLeft)*12);
-  moleTimers.push(setTimeout(()=>{if(gActive){spawnMole();scheduleMoles();}},speed+Math.random()*300));
+  // Base interval decreases with time + speed tier mult
+  const tier=SPEED_TIERS.findIndex(t=>score>=t.min&&score<=t.max)||0;
+  const mult=SPEED_TIERS[Math.max(0,tier)].mult;
+  const baseSpeed=Math.max(280,1100-(60-timeLeft)*10);
+  const speed=Math.round(baseSpeed/mult);
+  moleTimers.push(setTimeout(()=>{if(gActive){spawnMole();scheduleMoles();}},speed+Math.random()*200));
 }
 
 function spawnMole(){
@@ -1322,8 +1559,12 @@ function hitMole(hd,i,cx,cy){
   clearTimeout(comboTm);
   comboTm=setTimeout(()=>{combo=0;},1500);
   let pts=hd.type==='golden'?50:hd.type==='bad'||hd.type==='custom'?100:10;
-  const mult=combo>=5?3:combo>=3?2:1;
-  pts*=mult;score+=pts;hits++;
+  const baseMult=combo>=5?3:combo>=3?2:1;
+  const feverBoost=feverActive?1.5:1;
+  const mult=Math.round(baseMult*feverBoost*10)/10;
+  pts=Math.round(pts*mult);
+  score+=pts;hits++;
+  updateSpeedTier();
   sfxHit(pts);if(mult>1)sfxCombo();
   triggerHammer(cx,cy);
   const col=hd.type==='golden'?'#FFD600':hd.type==='bad'||hd.type==='custom'?'#F44336':mult>1?'#FF6D00':'#FFD600';
@@ -1405,6 +1646,7 @@ function endGame(){
   document.getElementById('fieldEl').style.cursor='';
   document.getElementById('fieldEl').onmousemove=null;
   holeData.forEach((hd,i)=>{if(hd.up)hideMole(hd,i);});
+  deactivateFever();
   sfxGameOver();
 
   if(CU){
@@ -1412,7 +1654,10 @@ function endGame(){
     if(score>CU.best)CU.best=score;
     CU.totalScore=(CU.totalScore||0)+score;
     CU.games=(CU.games||0)+1;
-    if(CU.totalScore>=TARGET)CU.rm88=true;
+    if(CU.totalScore>=TARGET&&!CU.rm88Pending&&!CU.rm88){
+      CU.rm88Pending=true; // Pending admin review — not auto-granted
+    }
+    if(CU.rm88Pending&&!CU.rm88){CU.rm88=false;} // Keep false until admin approves
     // Save to Firebase (async, non-blocking — show results immediately)
     DB.savePlayer(CU).catch(e=>console.error('Save player error:',e));
     DB.addGame({uid:CU.phone,name:CU.name,score,hits,combo:maxCombo,t:Date.now()}).catch(e=>console.error('Add game error:',e));
@@ -1432,11 +1677,16 @@ function renderResults(){
     `<div class="rs-box"><div class="rs-v">${totalSpawn?Math.round(hits/totalSpawn*100):0}%</div><div class="rs-l">${t('res_acc')}</div></div>`;
 
   const re=document.getElementById('rewardEl');
-  if(CU?.rm88||(CU?.totalScore||0)>=TARGET){
+  if(CU?.rm88){
     re.classList.remove('hidden');re.className='reward-box rm88';
-    document.getElementById('rewardIcon').textContent='🎉';
+    document.getElementById('rewardIcon').textContent='✅';
     document.getElementById('rewardTitle').textContent=t('r_rm88_title');
     document.getElementById('rewardSub').textContent=t('r_rm88_sub');
+  } else if(CU?.rm88Pending||(CU?.totalScore||0)>=TARGET){
+    re.classList.remove('hidden');re.className='reward-box rm88';
+    document.getElementById('rewardIcon').textContent='⏳';
+    document.getElementById('rewardTitle').textContent=LANG==='zh'?'🎊 已达标！等待审核':'🎊 Qualified! Pending Admin Review';
+    document.getElementById('rewardSub').textContent=LANG==='zh'?'恭喜！累积达88,888分！RM88 U88 Credit由管理员审核后发放。':'Congrats! Reached 88,888 pts! RM88 U88 Credit will be issued after admin review.';
   } else if(score>0){
     re.classList.remove('hidden');re.className='reward-box keep';
     document.getElementById('rewardIcon').textContent='📊';
@@ -1445,12 +1695,42 @@ function renderResults(){
     document.getElementById('rewardSub').textContent=t('r_keep_sub',{n:need.toLocaleString()});
   } else {re.classList.add('hidden');}
   document.getElementById('shareTextEl').textContent=t('res_share_text',{score:score.toLocaleString()});
+  document.getElementById('scScore').textContent=score.toLocaleString();
 }
 
 function doShare(){
-  const text=t('share_msg',{score:score.toLocaleString(),combo:maxCombo,code:CU?.code||'????'});
-  if(navigator.share){navigator.share({text}).catch(()=>{});}
-  else navigator.clipboard.writeText(text).then(()=>toast(t('t_share_copied')));
+  document.getElementById('shareModal').classList.remove('hidden');
+  document.getElementById('scScore').textContent=score.toLocaleString();
+}
+
+function shareTo(platform){
+  const code=CU?.code||'????';
+  const link=getRefLink(code);
+  const scoreStr=score.toLocaleString();
+  const msg=LANG==='zh'
+    ?`🔥 我在 Smash Fever 打出了 ${scoreStr} 分！\n你能超越我吗？🎮\n立即挑战：${link}\n#SmashFever #U88`
+    :`🔥 I scored ${scoreStr} pts in Smash Fever!\nCan you beat me? 🎮\nPlay now: ${link}\n#SmashFever #U88`;
+  const urls={
+    whatsapp:`https://wa.me/?text=${encodeURIComponent(msg)}`,
+    telegram:`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(msg)}`,
+    twitter:`https://twitter.com/intent/tweet?text=${encodeURIComponent(msg)}`,
+    facebook:`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`,
+  };
+  if(platform==='copy'){
+    navigator.clipboard.writeText(msg).then(()=>{
+      toast(LANG==='zh'?'📋 战绩已复制！':'📋 Copied!');
+      const el=document.getElementById('copyLinkLabel');
+      if(el){el.textContent='✅ Copied!';setTimeout(()=>{el.textContent=LANG==='zh'?'复制':'Copy Link';},2000);}
+    });
+    return;
+  }
+  if(platform==='native'){
+    if(navigator.share){navigator.share({text:msg,url:link}).catch(()=>{});}
+    else{navigator.clipboard.writeText(msg).then(()=>toast('📋 Copied!'));}
+    document.getElementById('shareModal').classList.add('hidden');
+    return;
+  }
+  if(urls[platform])window.open(urls[platform],'_blank');
 }
 
 // =================== LB ===================
@@ -1474,26 +1754,61 @@ async function showLB(){
 }
 
 // =================== INVITE ===================
+function getRefLink(code){
+  const base=window.location.href.split('?')[0].split('#')[0];
+  return base+'?ref='+code;
+}
+
 function openInvite(){
   if(!CU)return;
-  document.getElementById('myCode').textContent='UBAO-'+(CU.code||'????');
+  const code=CU.code||'????';
+  document.getElementById('myCode').textContent='UBAO-'+code;
+  const link=getRefLink(code);
+  const refDisp=document.getElementById('refLinkDisplay');
+  if(refDisp)refDisp.textContent=link;
+  // QR Code
+  const qrEl=document.getElementById('qrContainer');
+  if(qrEl){
+    qrEl.innerHTML='';
+    if(typeof QRCode!=='undefined'){
+      try{
+        new QRCode(qrEl,{text:link,width:140,height:140,colorDark:'#4CAF50',colorLight:'#111f38',correctLevel:QRCode.CorrectLevel.M});
+      }catch(e){qrEl.innerHTML='';}
+    }
+  }
   document.getElementById('invModal').classList.remove('hidden');
 }
-function copyCode(){
-  const c='UBAO-'+(CU?.code||'????');
-  const txt=t('invite_msg',{code:c});
-  navigator.clipboard.writeText(txt).then(()=>toast(t('t_copied')));
+
+function copyRefLink(){
+  if(!CU)return;
+  const link=getRefLink(CU.code||'????');
+  const msg=LANG==='zh'
+    ?`🐸 加入 Smash Fever，赢取 RM88 U88 Credit！\n邀请链接：${link}\n每邀请一位朋友 = RM8 U88 Credit！`
+    :`🐸 Join Smash Fever & win RM88 U88 Credit!\nInvite link: ${link}\nEvery friend = RM8 U88 Credit!`;
+  navigator.clipboard.writeText(msg).then(()=>toast(LANG==='zh'?'📋 已复制邀请链接！':'📋 Invite link copied!'));
+  document.getElementById('invModal').classList.add('hidden');
+}
+
+function shareRefLink(){
+  if(!CU)return;
+  const link=getRefLink(CU.code||'????');
+  const msg=LANG==='zh'
+    ?`🐸 加入 Smash Fever，赢取 RM88 U88 Credit！\n邀请链接：${link}`
+    :`🐸 Join Smash Fever & win RM88 U88 Credit!\nInvite link: ${link}`;
+  if(navigator.share){navigator.share({text:msg,url:link}).catch(()=>{});}
+  else{navigator.clipboard.writeText(msg).then(()=>toast('📋 Copied!'));}
   document.getElementById('invModal').classList.add('hidden');
 }
 
 // =================== ADMIN ===================
 function tryAdmin(){
+  // Can access via ?admin in URL or from menu
   const pw=prompt(t('t_admin_pw'));
   if(pw==='admin888'){showScreen('adminScreen');adminTab('overview',document.querySelector('.tab'));}
   else if(pw!==null)toast(t('t_wrong_pw'));
 }
 
-const spinnerRow=`<div style="text-align:center;padding:40px"><div class="spin" style="margin:0 auto 12px"></div><div style="color:var(--muted);font-size:13px">${'Loading...'}</div></div>`;
+const spinnerRow=`<div style="text-align:center;padding:40px"><div class="spin" style="margin:0 auto 12px"></div><div style="color:var(--muted);font-size:13px">Loading...</div></div>`;
 
 async function adminTab(tab,el){
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
@@ -1516,6 +1831,12 @@ async function adminTab(tab,el){
       <div class="sc"><div class="sc-v">${ps.reduce((s,p)=>s+(p.refs||0),0)}</div><div class="sc-l">${t('a_refs')}</div></div>
       </div>
       <div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:8px">${t('a_top10')}</div>
+      <div class="export-row">
+        <button class="export-btn" onclick="exportPlayers()">📥 ${LANG==='zh'?'导出玩家':'Export Players'}</button>
+        <button class="export-btn" onclick="exportGames()">📥 ${LANG==='zh'?'导出游戏记录':'Export Games'}</button>
+        <button class="export-btn" onclick="exportReferrals()">📥 ${LANG==='zh'?'导出邀请记录':'Export Referrals'}</button>
+        <button class="export-btn" onclick="exportRewards()">📥 ${LANG==='zh'?'导出奖励记录':'Export Rewards'}</button>
+      </div>
       <div class="tw"><table class="dt">
         <thead><tr><th>#</th><th>${t('a_th_name')}</th><th>${t('a_th_best')}</th><th>${t('a_th_games')}</th><th>RM88</th></tr></thead>
         <tbody>${[...ps].sort((a,b)=>b.best-a.best).slice(0,10).map((p,i)=>`<tr>
@@ -1603,6 +1924,26 @@ window.addEventListener('load',async()=>{
   try{const savedLang=localStorage.getItem('sf_lang');if(savedLang==='en'||savedLang==='zh')LANG=savedLang;}catch{}
   setLang(LANG);
 
+  // Handle ?ref= in URL → pre-fill referral
+  const urlRef=new URLSearchParams(window.location.search).get('ref');
+  if(urlRef){
+    DB.set('pendingRef', urlRef);
+    // Show ref box in login
+    const rb=document.getElementById('refBox');
+    const ri=document.getElementById('iRef');
+    if(rb){rb.style.display='block';}
+    if(ri){ri.value='UBAO-'+urlRef.toUpperCase();}
+  }
+
+  // Auto-fill pending ref
+  const pendingRef=DB.get('pendingRef');
+  if(pendingRef&&!urlRef){
+    const ri=document.getElementById('iRef');
+    const rb=document.getElementById('refBox');
+    if(ri)ri.value='UBAO-'+pendingRef.toUpperCase();
+    if(rb)rb.style.display='block';
+  }
+
   // Check Firebase config placeholder
   if(!fbReady){
     document.getElementById('firebaseErr').style.display='block';
@@ -1621,18 +1962,154 @@ window.addEventListener('load',async()=>{
         showLoading(false);
         showScreen('menuScreen');
         updateMenuUI();
+        initSoundPrompt();
         return;
       }
     }catch(e){console.error(e);}
     showLoading(false);
   }
   showScreen('loginScreen');
+  initSoundPrompt();
 });
 
 // Prevent double-tap zoom
 let lt=0;
 document.addEventListener('touchend',e=>{const n=Date.now();if(n-lt<280)e.preventDefault();lt=n;},{passive:false});
 document.addEventListener('pointerdown',()=>{getAC();},{once:true});
+
+// =================== EXIT GAME ===================
+function showExitModal(){
+  if(!gActive)return;
+  const el=document.getElementById('exitModal');
+  if(!el)return;
+  const title=document.getElementById('exitTitle');
+  const sub=document.getElementById('exitSub');
+  const cont=document.getElementById('exitContinueBtn');
+  const quit=document.getElementById('exitQuitBtn');
+  if(LANG==='zh'){
+    if(title)title.textContent='确定退出游戏？';
+    if(sub)sub.textContent='本次游戏记录将被保存用于统计。';
+    if(cont)cont.textContent='▶ 继续游戏';
+    if(quit)quit.textContent='✕ 确认退出';
+  } else {
+    if(title)title.textContent='Quit Game?';
+    if(sub)sub.textContent='Your current progress will be saved for statistics.';
+    if(cont)cont.textContent='▶ Keep Playing';
+    if(quit)quit.textContent='✕ Quit';
+  }
+  el.classList.remove('hidden');
+}
+
+function closeExitModal(){
+  const el=document.getElementById('exitModal');
+  if(el)el.classList.add('hidden');
+}
+
+function confirmExit(){
+  closeExitModal();
+  // Save partial game data
+  if(CU&&score>0){
+    DB.addGame({uid:CU.phone,name:CU.name,score,hits,combo:maxCombo,t:Date.now(),partial:true}).catch(()=>{});
+    if(score>(CU.best||0)){CU.best=score;}
+    CU.totalScore=(CU.totalScore||0)+score;
+    CU.games=(CU.games||0)+1;
+    if(CU.totalScore>=TARGET&&!CU.rm88){CU.rm88Pending=true;}
+    DB.savePlayer(CU).catch(()=>{});
+  }
+  gActive=false;
+  clearInterval(gTimer);
+  moleTimers.forEach(clearTimeout);moleTimers=[];
+  deactivateFever();
+  document.getElementById('hmrEl').style.display='none';
+  document.getElementById('fieldEl').style.cursor='';
+  document.getElementById('hTime').classList.remove('urgent');
+  showScreen('menuScreen');
+  updateMenuUI();
+}
+
+// =================== SOUND PROMPT ===================
+function initSoundPrompt(){
+  if(localStorage.getItem('sf_sound_ok'))return;
+  setTimeout(()=>{
+    const ov=document.getElementById('soundOv');
+    if(ov)ov.classList.remove('hidden');
+  },1500);
+}
+
+function closeSoundPrompt(){
+  const ov=document.getElementById('soundOv');
+  if(ov)ov.classList.add('hidden');
+  localStorage.setItem('sf_sound_ok','1');
+  // Try to unlock audio
+  getAC();
+}
+
+// =================== CSV EXPORT ===================
+function exportCSV(data, filename){
+  if(!data.length){toast(LANG==='zh'?'暂无数据':'No data to export');return;}
+  const headers=Object.keys(data[0]);
+  const rows=[headers.join(','),...data.map(r=>headers.map(h=>{
+    const v=r[h]??'';
+    const s=String(v).replace(/"/g,'""');
+    return /[,"\n]/.test(s)?`"${s}"`:s;
+  }).join(','))];
+  const blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=filename+'.csv';a.click();
+  URL.revokeObjectURL(url);
+  toast(LANG==='zh'?`✅ 已导出 ${filename}.csv`:`✅ Exported ${filename}.csv`);
+}
+
+async function exportPlayers(){
+  const ps=await DB.getAllPlayers();
+  exportCSV(ps.map(p=>({
+    'User ID':p.phone,'Name':p.name,'Phone':p.phone,
+    'Register Date':new Date(p.joined||0).toLocaleDateString(),
+    'Invite Code':p.code||'','Referral Count':p.refs||0,
+    'Total Score':p.totalScore||0,'Best Score':p.best||0,
+    'Games Played':p.games||0,'RM88 Pending':p.rm88Pending?'Yes':'No',
+    'RM88 Approved':p.rm88?'Yes':'No',
+    'Ref Reward':'RM'+(p.refRew||0),'Last Login':new Date(p.lastLogin||0).toLocaleDateString()
+  })),'smash-fever-players');
+}
+
+async function exportGames(){
+  const gs=await DB.getGames();
+  exportCSV(gs.map(g=>({
+    'User ID':g.uid,'Player Name':g.name,'Score':g.score,
+    'Hits':g.hits||0,'Best Combo':g.combo||0,
+    'Date':new Date(g.t||0).toLocaleDateString(),
+    'Time':new Date(g.t||0).toLocaleTimeString(),
+    'Partial (Exited)':g.partial?'Yes':'No'
+  })),'smash-fever-games');
+}
+
+async function exportReferrals(){
+  const ps=await DB.getAllPlayers();
+  const rows=[];
+  ps.forEach(p=>{
+    if(p.refBy){
+      rows.push({'Referrer Code':p.refBy,'Invited User':p.name,'Phone':mask(p.phone),'Register Date':new Date(p.joined||0).toLocaleDateString(),'Status':'Registered'});
+    }
+  });
+  exportCSV(rows,'smash-fever-referrals');
+}
+
+async function exportRewards(){
+  const ps=await DB.getAllPlayers();
+  exportCSV(ps.filter(p=>p.rm88Pending||p.rm88||(p.refRew||0)>0).map(p=>({
+    'User ID':p.phone,'Name':p.name,'RM88 Score':p.rm88Pending||p.rm88?'Qualified':'No',
+    'RM88 Status':p.rm88?'Approved':'Pending','Referrals':p.refs||0,'Ref Reward':'RM'+(p.refRew||0),
+    'Total Reward':'RM'+Math.min((p.rm88?88:0)+(p.refRew||0),88)
+  })),'smash-fever-rewards');
+}
+
+// =================== ADMIN URL CHECK ===================
+function checkAdminUrl(){
+  // Show admin option only if ?admin in URL
+  return window.location.search.includes('admin')||window.location.hash.includes('admin');
+}
 
 // =================== PWA ===================
 let deferredPrompt = null;
